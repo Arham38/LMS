@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard,
@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { Wordmark } from '../../config/brand';
 import { useAuth } from '../../context/AuthContext';
+import enrollmentService from '../../services/enrollment.service';
 import Avatar from '../ui/Avatar';
 import DropdownMenu from '../ui/DropdownMenu';
 import Badge from '../ui/Badge';
@@ -30,6 +31,21 @@ export const AdminLayout = () => {
   const location = useLocation();
   const { user, logout } = useAuth();
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const [pendingEnrollmentCount, setPendingEnrollmentCount] = useState(0);
+
+  useEffect(() => {
+    const fetchPending = async () => {
+      try {
+        const res = await enrollmentService.getPendingCount();
+        setPendingEnrollmentCount(res?.count || 0);
+      } catch {
+        // ignore background badge poll errors
+      }
+    };
+    fetchPending();
+    const interval = setInterval(fetchPending, 30000); // Check every 30s
+    return () => clearInterval(interval);
+  }, [location.pathname]);
 
   const navigationGroups = [
     {
@@ -52,14 +68,19 @@ export const AdminLayout = () => {
       group: 'People',
       items: [
         { label: 'All Students', to: '/admin/students', icon: Users },
-        { label: 'Enrollment Requests', to: '/admin/enrollments', icon: UserCheck, badge: '5' },
+        {
+          label: 'Enrollment Requests',
+          to: '/admin/enrollments',
+          icon: UserCheck,
+          badge: pendingEnrollmentCount > 0 ? String(pendingEnrollmentCount) : null,
+        },
         { label: 'Live Attendance', to: '/admin/attendance', icon: ClipboardList },
       ],
     },
     {
       group: 'Money',
       items: [
-        { label: 'Payment Proofs', to: '/admin/payments', icon: CreditCard, badge: '3' },
+        { label: 'Payment Proofs', to: '/admin/payments', icon: CreditCard },
         { label: 'Ledger & Revenue', to: '/admin/ledger', icon: Receipt },
         { label: 'System Settings', to: '/admin/settings', icon: Settings },
       ],

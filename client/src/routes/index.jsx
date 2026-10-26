@@ -10,6 +10,16 @@ import RoleRoute from '../components/auth/RoleRoute';
 import GuestRoute from '../components/auth/GuestRoute';
 
 import HomePage from '../pages/public/HomePage';
+import CoursesPage from '../pages/public/CoursesPage';
+import CourseDetailPage from '../pages/public/CourseDetailPage';
+import EnrollmentWizardPage from '../pages/student/EnrollmentWizardPage';
+import MyEnrollmentsPage from '../pages/student/MyEnrollmentsPage';
+
+import AdminCoursesPage from '../pages/admin/AdminCoursesPage';
+import AdminCourseEditorPage from '../pages/admin/AdminCourseEditorPage';
+import AdminEnrollmentsPage from '../pages/admin/AdminEnrollmentsPage';
+import AdminSettingsPage from '../pages/admin/AdminSettingsPage';
+
 import LoginPage from '../pages/auth/LoginPage';
 import RegisterPage from '../pages/auth/RegisterPage';
 import ForgotPasswordPage from '../pages/auth/ForgotPasswordPage';
@@ -26,18 +36,8 @@ export const router = createBrowserRouter([
     element: <PublicLayout />,
     children: [
       { index: true, element: <HomePage /> },
-      {
-        path: 'courses',
-        element: (
-          <PhasePlaceholder
-            title="Course Catalog & Cohorts"
-            subtitle="Browse live bootcamps, syllabi, fee schedules, and upcoming dates."
-            phaseNumber="1"
-            phaseName="Public Catalog & Course Pages"
-            breadcrumbs={[{ label: 'Home', to: '/' }, { label: 'Courses' }]}
-          />
-        ),
-      },
+      { path: 'courses', element: <CoursesPage /> },
+      { path: 'courses/:slug', element: <CourseDetailPage /> },
       {
         path: 'about',
         element: (
@@ -101,6 +101,16 @@ export const router = createBrowserRouter([
     ],
   },
 
+  // 3-Step Enrollment Wizard (Protected for Students)
+  {
+    path: '/enroll/:courseId',
+    element: (
+      <ProtectedRoute>
+        <EnrollmentWizardPage />
+      </ProtectedRoute>
+    ),
+  },
+
   // Guest-only Auth Routes (Redirect to dashboard if already authenticated)
   {
     path: '/login',
@@ -159,15 +169,7 @@ export const router = createBrowserRouter([
       },
       {
         path: 'courses',
-        element: (
-          <PhasePlaceholder
-            title="My Enrolled Courses"
-            subtitle="Syllabus progress, batch details, and class timings."
-            phaseNumber="2"
-            phaseName="Enrolled Courses"
-            breadcrumbs={[{ label: 'Portal', to: '/student/dashboard' }, { label: 'Courses' }]}
-          />
-        ),
+        element: <MyEnrollmentsPage />,
       },
       {
         path: 'schedule',
@@ -219,15 +221,7 @@ export const router = createBrowserRouter([
       },
       {
         path: 'payments',
-        element: (
-          <PhasePlaceholder
-            title="Payment History & Proofs"
-            subtitle="Upload JazzCash/Easypaisa/Bank receipt screenshots and check approval status."
-            phaseNumber="2"
-            phaseName="Payment Verification"
-            breadcrumbs={[{ label: 'Portal', to: '/student/dashboard' }, { label: 'Payments' }]}
-          />
-        ),
+        element: <MyEnrollmentsPage />,
       },
       {
         path: 'profile',
@@ -274,15 +268,15 @@ export const router = createBrowserRouter([
       },
       {
         path: 'courses',
-        element: (
-          <PhasePlaceholder
-            title="Course & Batch Management"
-            subtitle="Create and configure bootcamps, batches, seats, and fees."
-            phaseNumber="2"
-            phaseName="Course Management"
-            breadcrumbs={[{ label: 'Admin', to: '/admin/dashboard' }, { label: 'Courses' }]}
-          />
-        ),
+        element: <AdminCoursesPage />,
+      },
+      {
+        path: 'courses/new',
+        element: <AdminCourseEditorPage />,
+      },
+      {
+        path: 'courses/:id/edit',
+        element: <AdminCourseEditorPage />,
       },
       {
         path: 'sessions',
@@ -334,15 +328,7 @@ export const router = createBrowserRouter([
       },
       {
         path: 'enrollments',
-        element: (
-          <PhasePlaceholder
-            title="Enrollment Requests"
-            subtitle="Review pending student admissions and verify payment receipts."
-            phaseNumber="2"
-            phaseName="Enrollment Approvals"
-            breadcrumbs={[{ label: 'Admin', to: '/admin/dashboard' }, { label: 'Enrollments' }]}
-          />
-        ),
+        element: <AdminEnrollmentsPage />,
       },
       {
         path: 'attendance',
@@ -358,15 +344,7 @@ export const router = createBrowserRouter([
       },
       {
         path: 'payments',
-        element: (
-          <PhasePlaceholder
-            title="Payment Proofs Verification"
-            subtitle="Inspect JazzCash/Easypaisa/IBFT receipt screenshots and approve seats."
-            phaseNumber="2"
-            phaseName="Manual Payment Approval"
-            breadcrumbs={[{ label: 'Admin', to: '/admin/dashboard' }, { label: 'Payment Proofs' }]}
-          />
-        ),
+        element: <AdminEnrollmentsPage />,
       },
       {
         path: 'ledger',
@@ -382,15 +360,7 @@ export const router = createBrowserRouter([
       },
       {
         path: 'settings',
-        element: (
-          <PhasePlaceholder
-            title="System & Account Settings"
-            subtitle="Update instructor profile, bank details, and notification preferences."
-            phaseNumber="4"
-            phaseName="System Settings"
-            breadcrumbs={[{ label: 'Admin', to: '/admin/dashboard' }, { label: 'Settings' }]}
-          />
-        ),
+        element: <AdminSettingsPage />,
       },
       {
         path: 'profile',

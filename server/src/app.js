@@ -10,8 +10,10 @@ import notFound from './middleware/notFound.js';
 import errorHandler from './middleware/errorHandler.js';
 import healthRoutes from './routes/health.routes.js';
 import authRoutes from './routes/auth.routes.js';
-import { protect, authorizeRoles } from './middleware/auth.middleware.js';
-import { sendSuccess } from './utils/response.js';
+import courseRoutes from './routes/course.routes.js';
+import enrollmentRoutes from './routes/enrollment.routes.js';
+import settingsRoutes from './routes/settings.routes.js';
+import adminRoutes from './routes/admin.routes.js';
 
 const app = express();
 
@@ -62,14 +64,10 @@ if (env.NODE_ENV !== 'test') {
 // API Routes
 app.use('/api', healthRoutes);
 app.use('/api/auth', authRoutes);
-
-// Admin role check verification route
-app.get('/api/admin/ping', protect, authorizeRoles('admin'), (req, res) => {
-  return sendSuccess(res, {
-    data: { role: req.user.role },
-    message: 'Admin access verified',
-  });
-});
+app.use('/api/courses', courseRoutes);
+app.use('/api/enrollments', enrollmentRoutes);
+app.use('/api/settings', settingsRoutes);
+app.use('/api/admin', adminRoutes);
 
 // 404 Handler
 app.use(notFound);
