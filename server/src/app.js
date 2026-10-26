@@ -16,6 +16,7 @@ import settingsRoutes from './routes/settings.routes.js';
 import adminRoutes from './routes/admin.routes.js';
 import uploadRoutes from './routes/upload.routes.js';
 import fileRoutes from './routes/file.routes.js';
+import sessionRoutes from './routes/session.routes.js';
 
 const app = express();
 
@@ -67,6 +68,7 @@ if (env.NODE_ENV !== 'test') {
 app.use('/api', healthRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/courses', courseRoutes);
+app.use('/api/sessions', sessionRoutes);
 app.use('/api/enrollments', enrollmentRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/admin', adminRoutes);

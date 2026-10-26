@@ -1,5 +1,6 @@
 import { createUploadUrl, createDownloadUrl, FILE_RULES } from '../services/storage.service.js';
 import Enrollment from '../models/enrollment.model.js';
+import Session from '../models/session.model.js';
 import ApiError from '../utils/ApiError.js';
 import asyncHandler from '../utils/asyncHandler.js';
 import { sendSuccess } from '../utils/response.js';
@@ -53,7 +54,22 @@ export const getFileDownloadUrl = asyncHandler(async (req, res) => {
       }
     }
 
-    // 2. (Reserved for future phases: check course notes or student assignments)
+    // 2. Check if key is a course lecture note or session resource
+    if (!isAllowed) {
+      const sessionWithResource = await Session.findOne({ 'resources.fileKey': key });
+      if (sessionWithResource) {
+        const approvedEnrollment = await Enrollment.findOne({
+          student: req.user._id,
+          course: sessionWithResource.course,
+          status: 'approved',
+        });
+        if (approvedEnrollment) {
+          isAllowed = true;
+        }
+      }
+    }
+
+    // 3. (Reserved for Phase 5: student assignment submissions)
   }
 
   if (!isAllowed) {

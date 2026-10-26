@@ -3,6 +3,7 @@ import env from '../config/env.js';
 import User from '../models/user.model.js';
 import Course, { generateSlug } from '../models/course.model.js';
 import Settings from '../models/settings.model.js';
+import Session from '../models/session.model.js';
 
 export const seedDatabase = async () => {
   try {
@@ -125,6 +126,68 @@ export const seedDatabase = async () => {
 
       await Course.create(sampleCourses);
       console.log(`Sample bootcamps created (${sampleCourses.length} courses).`);
+    }
+
+    // 4. Seed Sample Sessions if none exist
+    const sessionCount = await Session.countDocuments();
+    if (sessionCount === 0) {
+      const primaryCourse = await Course.findOne();
+      if (primaryCourse) {
+        const now = Date.now();
+        const sampleSessions = [
+          {
+            course: primaryCourse._id,
+            week: 1,
+            order: 1,
+            title: 'Cohort Orientation & Development Environment Setup',
+            description: 'Installing Node.js v20, VS Code, Git conventions, and monorepo structure.',
+            scheduledAt: new Date(now - 3 * 24 * 60 * 60 * 1000), // 3 days ago
+            durationMinutes: 120,
+            meetingLink: 'https://meet.google.com/cda-mern-session1',
+            status: 'completed',
+            isPublished: true,
+            resources: [
+              {
+                title: 'Week 1 Setup Guide (PDF)',
+                fileKey: 'uploads/pdf/admin/sample-setup.pdf',
+              },
+            ],
+          },
+          {
+            course: primaryCourse._id,
+            week: 1,
+            order: 2,
+            title: 'Asynchronous JavaScript & Node.js Event Loop',
+            description: 'Microtasks, macrotasks, process.nextTick, timers, and custom EventEmitter patterns.',
+            scheduledAt: new Date(now + 2 * 60 * 60 * 1000), // 2 hours from now
+            durationMinutes: 120,
+            meetingLink: 'https://meet.google.com/cda-mern-session2',
+            status: 'upcoming',
+            isPublished: true,
+            resources: [
+              {
+                title: 'Event Loop Deep-Dive Slides (PDF)',
+                fileKey: 'uploads/pdf/admin/event-loop-slides.pdf',
+              },
+            ],
+          },
+          {
+            course: primaryCourse._id,
+            week: 2,
+            order: 3,
+            title: 'Express Routing Pipelines & Middleware Architecture',
+            description: 'Error handler chains, Zod validation, JWT verification, and rate limiting.',
+            scheduledAt: new Date(now + 3 * 24 * 60 * 60 * 1000), // 3 days from now
+            durationMinutes: 120,
+            meetingLink: 'https://meet.google.com/cda-mern-session3',
+            status: 'upcoming',
+            isPublished: true,
+          },
+        ];
+
+        await Session.create(sampleSessions);
+        console.log(`Sample live sessions created (${sampleSessions.length} sessions).`);
+      }
     }
 
     await disconnectDB();

@@ -19,6 +19,10 @@ import AdminCoursesPage from '../pages/admin/AdminCoursesPage';
 import AdminCourseEditorPage from '../pages/admin/AdminCourseEditorPage';
 import AdminEnrollmentsPage from '../pages/admin/AdminEnrollmentsPage';
 import AdminSettingsPage from '../pages/admin/AdminSettingsPage';
+import AdminSessionsPage from '../pages/admin/AdminSessionsPage';
+import AdminTodayPage from '../pages/admin/AdminTodayPage';
+import StudentCourseSpacePage from '../pages/student/StudentCourseSpacePage';
+import StudentScheduleRouter from '../pages/student/StudentScheduleRouter';
 
 import LoginPage from '../pages/auth/LoginPage';
 import RegisterPage from '../pages/auth/RegisterPage';
@@ -172,16 +176,12 @@ export const router = createBrowserRouter([
         element: <MyEnrollmentsPage />,
       },
       {
+        path: 'courses/:courseId',
+        element: <StudentCourseSpacePage />,
+      },
+      {
         path: 'schedule',
-        element: (
-          <PhasePlaceholder
-            title="Live Class Schedule & Join Link"
-            subtitle="Google Meet/Zoom access link (active 15m prior to start)."
-            phaseNumber="2"
-            phaseName="Live Sessions & Attendance"
-            breadcrumbs={[{ label: 'Portal', to: '/student/dashboard' }, { label: 'Schedule' }]}
-          />
-        ),
+        element: <StudentScheduleRouter />,
       },
       {
         path: 'assignments',
@@ -267,6 +267,10 @@ export const router = createBrowserRouter([
         ),
       },
       {
+        path: 'today',
+        element: <AdminTodayPage />,
+      },
+      {
         path: 'courses',
         element: <AdminCoursesPage />,
       },
@@ -279,16 +283,12 @@ export const router = createBrowserRouter([
         element: <AdminCourseEditorPage />,
       },
       {
+        path: 'courses/:id/sessions',
+        element: <AdminSessionsPage />,
+      },
+      {
         path: 'sessions',
-        element: (
-          <PhasePlaceholder
-            title="Live Sessions & Join Links"
-            subtitle="Schedule Google Meet/Zoom classes and configure meeting URLs."
-            phaseNumber="2"
-            phaseName="Live Sessions & Class Control"
-            breadcrumbs={[{ label: 'Admin', to: '/admin/dashboard' }, { label: 'Live Sessions' }]}
-          />
-        ),
+        element: <AdminSessionsPage />,
       },
       {
         path: 'tasks',
@@ -332,15 +332,7 @@ export const router = createBrowserRouter([
       },
       {
         path: 'attendance',
-        element: (
-          <PhasePlaceholder
-            title="Live Attendance Records"
-            subtitle="Track student join/leave logs for each live session."
-            phaseNumber="2"
-            phaseName="Attendance Tracking"
-            breadcrumbs={[{ label: 'Admin', to: '/admin/dashboard' }, { label: 'Attendance' }]}
-          />
-        ),
+        element: <AdminSessionsPage />,
       },
       {
         path: 'payments',

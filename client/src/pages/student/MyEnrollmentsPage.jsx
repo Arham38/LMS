@@ -206,9 +206,9 @@ export const MyEnrollmentsPage = () => {
                           </span>
                         </div>
                       </div>
-                      <Link to="/student/schedule">
+                      <Link to={`/student/courses/${course._id}`}>
                         <Button variant="primary" size="sm">
-                          View Live Schedule
+                          Enter Course Space
                         </Button>
                       </Link>
                     </div>

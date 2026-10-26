@@ -5,6 +5,7 @@ import {
   BarChart3,
   BookOpen,
   Video,
+  Calendar,
   FileCheck2,
   FileText,
   Users,
@@ -58,6 +59,7 @@ export const AdminLayout = () => {
     {
       group: 'Teaching',
       items: [
+        { label: 'Today', to: '/admin/today', icon: Calendar },
         { label: 'Courses & Batches', to: '/admin/courses', icon: BookOpen },
         { label: 'Live Sessions', to: '/admin/sessions', icon: Video },
         { label: 'Quizzes & Tasks', to: '/admin/tasks', icon: FileCheck2 },

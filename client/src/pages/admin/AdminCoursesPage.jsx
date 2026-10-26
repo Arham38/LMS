@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import {
   Plus,
   BookOpen,
+  Video,
   Edit,
   Trash2,
   MoreVertical,
@@ -168,6 +169,11 @@ export const AdminCoursesPage = () => {
           align="right"
           trigger={<IconButton icon={MoreVertical} size="sm" aria-label="Course actions" />}
           items={[
+            {
+              label: 'Live Sessions & Notes',
+              icon: Video,
+              onClick: () => navigate(`/admin/sessions?courseId=${row._id}`),
+            },
             {
               label: 'Edit Bootcamp',
               icon: Edit,
