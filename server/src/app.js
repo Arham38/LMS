@@ -21,6 +21,7 @@ import quizRoutes from './routes/quiz.routes.js';
 import assignmentRoutes from './routes/assignment.routes.js';
 import notificationRoutes from './routes/notification.routes.js';
 import studentRoutes from './routes/student.routes.js';
+import contactRoutes from './routes/contact.routes.js';
 
 const app = express();
 
@@ -77,6 +78,7 @@ app.use('/api', quizRoutes);
 app.use('/api', assignmentRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/student', studentRoutes);
+app.use('/api/contact', contactRoutes);
 app.use('/api/enrollments', enrollmentRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/admin', adminRoutes);

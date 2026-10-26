@@ -1,5 +1,6 @@
 import Notification from '../models/notification.model.js';
 import Enrollment from '../models/enrollment.model.js';
+import User from '../models/user.model.js';
 
 export const notificationService = {
   /**
@@ -49,6 +50,27 @@ export const notificationService = {
       return await Notification.insertMany(notifications);
     } catch (err) {
       console.error('[NotificationService] Error sending course bulk notifications:', err.message);
+      return [];
+    }
+  },
+
+  /**
+   * Broadcast a notification to all admin users (e.g. new contact message or critical alert)
+   */
+  async notifyAdmins({ type, title, body, link = '' }) {
+    try {
+      const admins = await User.find({ role: 'admin' }).select('_id');
+      if (!admins.length) return [];
+      const notifications = admins.map((adm) => ({
+        user: adm._id,
+        type,
+        title,
+        body,
+        link,
+      }));
+      return await Notification.insertMany(notifications);
+    } catch (err) {
+      console.error('[NotificationService] Error sending admin notification:', err.message);
       return [];
     }
   },

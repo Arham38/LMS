@@ -1,0 +1,50 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="1200" height="630" fill="#090d16"/>
+  
+  <!-- Subtle decorative grid border -->
+  <rect x="40" y="40" width="1120" height="550" rx="8" stroke="#1e293b" stroke-width="2"/>
+  <rect x="48" y="48" width="1104" height="534" rx="4" stroke="#334155" stroke-opacity="0.3" stroke-width="1"/>
+
+  <!-- Brand Mark -->
+  <rect x="80" y="88" width="32" height="32" rx="4" fill="#d97706"/>
+  <text x="126" y="112" fill="#f8fafc" font-family="system-ui, -apple-system, sans-serif" font-size="28" font-weight="700" letter-spacing="-0.02em">CodeCraft</text>
+  <text x="268" y="112" fill="#94a3b8" font-family="system-ui, -apple-system, sans-serif" font-size="18" font-weight="400">/ Bootcamp</text>
+
+  <!-- Status pill -->
+  <rect x="910" y="84" width="210" height="36" rx="18" fill="#1e293b" stroke="#334155" stroke-width="1"/>
+  <circle cx="930" cy="102" r="4" fill="#10b981"/>
+  <text x="946" y="107" fill="#cbd5e1" font-family="system-ui, -apple-system, sans-serif" font-size="14" font-weight="500">Live Online Cohort</text>
+
+  <!-- Editorial Headline -->
+  <text x="80" y="230" fill="#ffffff" font-family="Georgia, serif" font-size="52" font-weight="600" letter-spacing="-0.02em">
+    Build production-grade web
+  </text>
+  <text x="80" y="295" fill="#ffffff" font-family="Georgia, serif" font-size="52" font-weight="600" letter-spacing="-0.02em">
+    applications in 12 weeks.
+  </text>
+
+  <!-- Subtitle -->
+  <text x="80" y="370" fill="#94a3b8" font-family="system-ui, -apple-system, sans-serif" font-size="22" font-weight="400">
+    A rigorous full-stack engineering cohort for developers who want real craft.
+  </text>
+
+  <!-- Horizontal divider -->
+  <line x1="80" y1="420" x2="1120" y2="420" stroke="#1e293b" stroke-width="1.5"/>
+
+  <!-- Feature metrics footer -->
+  <g transform="translate(80, 460)">
+    <text x="0" y="20" fill="#e2e8f0" font-family="system-ui, -apple-system, sans-serif" font-size="16" font-weight="600">SCHEDULE</text>
+    <text x="0" y="46" fill="#94a3b8" font-family="system-ui, -apple-system, sans-serif" font-size="18">Mon, Wed, Fri (8–10 PM PKT)</text>
+  </g>
+
+  <g transform="translate(420, 460)">
+    <text x="0" y="20" fill="#e2e8f0" font-family="system-ui, -apple-system, sans-serif" font-size="16" font-weight="600">STRUCTURE</text>
+    <text x="0" y="46" fill="#94a3b8" font-family="system-ui, -apple-system, sans-serif" font-size="18">36 Live Sessions + Code Reviews</text>
+  </g>
+
+  <g transform="translate(820, 460)">
+    <text x="0" y="20" fill="#e2e8f0" font-family="system-ui, -apple-system, sans-serif" font-size="16" font-weight="600">CAPACITY</text>
+    <text x="0" y="46" fill="#94a3b8" font-family="system-ui, -apple-system, sans-serif" font-size="18">Capped at 25 Students</text>
+  </g>
+</svg>

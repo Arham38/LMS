@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { lazy } from 'react';
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 
 import PublicLayout from '../components/layout/PublicLayout';
@@ -8,43 +8,58 @@ import AdminLayout from '../components/layout/AdminLayout';
 import ProtectedRoute from '../components/auth/ProtectedRoute';
 import RoleRoute from '../components/auth/RoleRoute';
 import GuestRoute from '../components/auth/GuestRoute';
+import RouteSuspense from '../components/common/RouteSuspense';
 
-import HomePage from '../pages/public/HomePage';
-import CoursesPage from '../pages/public/CoursesPage';
-import CourseDetailPage from '../pages/public/CourseDetailPage';
-import EnrollmentWizardPage from '../pages/student/EnrollmentWizardPage';
-import MyEnrollmentsPage from '../pages/student/MyEnrollmentsPage';
+// Lazy Loaded Public Pages
+const HomePage = lazy(() => import('../pages/public/HomePage'));
+const CoursesPage = lazy(() => import('../pages/public/CoursesPage'));
+const CourseDetailPage = lazy(() => import('../pages/public/CourseDetailPage'));
+const AboutPage = lazy(() => import('../pages/public/AboutPage'));
+const ContactPage = lazy(() => import('../pages/public/ContactPage'));
+const FAQPage = lazy(() => import('../pages/public/FAQPage'));
+const TermsPage = lazy(() => import('../pages/public/TermsPage'));
+const PrivacyPage = lazy(() => import('../pages/public/PrivacyPage'));
+const RefundPolicyPage = lazy(() => import('../pages/public/RefundPolicyPage'));
 
-import AdminCoursesPage from '../pages/admin/AdminCoursesPage';
-import AdminCourseEditorPage from '../pages/admin/AdminCourseEditorPage';
-import AdminEnrollmentsPage from '../pages/admin/AdminEnrollmentsPage';
-import AdminSettingsPage from '../pages/admin/AdminSettingsPage';
-import AdminSessionsPage from '../pages/admin/AdminSessionsPage';
-import AdminTodayPage from '../pages/admin/AdminTodayPage';
-import AdminQuizzesPage from '../pages/admin/AdminQuizzesPage';
-import AdminQuizBuilderPage from '../pages/admin/AdminQuizBuilderPage';
-import AdminAssignmentsPage from '../pages/admin/AdminAssignmentsPage';
-import AdminGradingSplitPage from '../pages/admin/AdminGradingSplitPage';
-import AdminDashboardPage from '../pages/admin/AdminDashboardPage';
-import AdminStudentsPage from '../pages/admin/AdminStudentsPage';
-import AdminStudentDetailPage from '../pages/admin/AdminStudentDetailPage';
-import AdminAnnouncementsPage from '../pages/admin/AdminAnnouncementsPage';
-import AdminGradebookPage from '../pages/admin/AdminGradebookPage';
-import StudentDashboardPage from '../pages/student/StudentDashboardPage';
-import StudentGradesPage from '../pages/student/StudentGradesPage';
-import NotificationsPage from '../pages/NotificationsPage';
-import StudentCourseSpacePage from '../pages/student/StudentCourseSpacePage';
-import StudentScheduleRouter from '../pages/student/StudentScheduleRouter';
-import StudentQuizPage from '../pages/student/StudentQuizPage';
+// Lazy Loaded Auth Pages
+const LoginPage = lazy(() => import('../pages/auth/LoginPage'));
+const RegisterPage = lazy(() => import('../pages/auth/RegisterPage'));
+const ForgotPasswordPage = lazy(() => import('../pages/auth/ForgotPasswordPage'));
+const ResetPasswordPage = lazy(() => import('../pages/auth/ResetPasswordPage'));
 
-import LoginPage from '../pages/auth/LoginPage';
-import RegisterPage from '../pages/auth/RegisterPage';
-import ForgotPasswordPage from '../pages/auth/ForgotPasswordPage';
-import ResetPasswordPage from '../pages/auth/ResetPasswordPage';
-import ProfilePage from '../pages/profile/ProfilePage';
-import NotFoundPage from '../pages/NotFoundPage';
-import StyleguidePage from '../pages/dev/StyleguidePage';
-import PhasePlaceholder from '../pages/PhasePlaceholder';
+// Lazy Loaded Student Pages
+const EnrollmentWizardPage = lazy(() => import('../pages/student/EnrollmentWizardPage'));
+const MyEnrollmentsPage = lazy(() => import('../pages/student/MyEnrollmentsPage'));
+const StudentDashboardPage = lazy(() => import('../pages/student/StudentDashboardPage'));
+const StudentCourseSpacePage = lazy(() => import('../pages/student/StudentCourseSpacePage'));
+const StudentScheduleRouter = lazy(() => import('../pages/student/StudentScheduleRouter'));
+const StudentQuizPage = lazy(() => import('../pages/student/StudentQuizPage'));
+const StudentGradesPage = lazy(() => import('../pages/student/StudentGradesPage'));
+
+// Lazy Loaded Admin Pages
+const AdminDashboardPage = lazy(() => import('../pages/admin/AdminDashboardPage'));
+const AdminTodayPage = lazy(() => import('../pages/admin/AdminTodayPage'));
+const AdminCoursesPage = lazy(() => import('../pages/admin/AdminCoursesPage'));
+const AdminCourseEditorPage = lazy(() => import('../pages/admin/AdminCourseEditorPage'));
+const AdminSessionsPage = lazy(() => import('../pages/admin/AdminSessionsPage'));
+const AdminQuizzesPage = lazy(() => import('../pages/admin/AdminQuizzesPage'));
+const AdminQuizBuilderPage = lazy(() => import('../pages/admin/AdminQuizBuilderPage'));
+const AdminAssignmentsPage = lazy(() => import('../pages/admin/AdminAssignmentsPage'));
+const AdminGradingSplitPage = lazy(() => import('../pages/admin/AdminGradingSplitPage'));
+const AdminStudentsPage = lazy(() => import('../pages/admin/AdminStudentsPage'));
+const AdminStudentDetailPage = lazy(() => import('../pages/admin/AdminStudentDetailPage'));
+const AdminAnnouncementsPage = lazy(() => import('../pages/admin/AdminAnnouncementsPage'));
+const AdminGradebookPage = lazy(() => import('../pages/admin/AdminGradebookPage'));
+const AdminEnrollmentsPage = lazy(() => import('../pages/admin/AdminEnrollmentsPage'));
+const AdminSettingsPage = lazy(() => import('../pages/admin/AdminSettingsPage'));
+const AdminMessagesPage = lazy(() => import('../pages/admin/AdminMessagesPage'));
+
+// Lazy Loaded Common Pages
+const NotificationsPage = lazy(() => import('../pages/NotificationsPage'));
+const ProfilePage = lazy(() => import('../pages/profile/ProfilePage'));
+const NotFoundPage = lazy(() => import('../pages/NotFoundPage'));
+const StyleguidePage = lazy(() => import('../pages/dev/StyleguidePage'));
+const PhasePlaceholder = lazy(() => import('../pages/PhasePlaceholder'));
 
 export const router = createBrowserRouter([
   // Public Route Group
@@ -52,68 +67,85 @@ export const router = createBrowserRouter([
     path: '/',
     element: <PublicLayout />,
     children: [
-      { index: true, element: <HomePage /> },
-      { path: 'courses', element: <CoursesPage /> },
-      { path: 'courses/:slug', element: <CourseDetailPage /> },
       {
-        path: 'about',
+        index: true,
         element: (
-          <PhasePlaceholder
-            title="About CodeCraft Academy"
-            subtitle="Meet the instructor and learn our engineering-first teaching philosophy."
-            phaseNumber="1"
-            phaseName="About & Admissions"
-            breadcrumbs={[{ label: 'Home', to: '/' }, { label: 'About' }]}
-          />
+          <RouteSuspense>
+            <HomePage />
+          </RouteSuspense>
         ),
       },
       {
-        path: 'admissions',
+        path: 'courses',
         element: (
-          <PhasePlaceholder
-            title="Admissions & Payment Instructions"
-            subtitle="Step-by-step guidance for JazzCash, Easypaisa, and IBFT bank transfers."
-            phaseNumber="1"
-            phaseName="Admissions & Information"
-            breadcrumbs={[{ label: 'Home', to: '/' }, { label: 'Admissions' }]}
-          />
+          <RouteSuspense>
+            <CoursesPage />
+          </RouteSuspense>
+        ),
+      },
+      {
+        path: 'courses/:slug',
+        element: (
+          <RouteSuspense>
+            <CourseDetailPage />
+          </RouteSuspense>
+        ),
+      },
+      {
+        path: 'about',
+        element: (
+          <RouteSuspense>
+            <AboutPage />
+          </RouteSuspense>
         ),
       },
       {
         path: 'contact',
         element: (
-          <PhasePlaceholder
-            title="Contact Support"
-            subtitle="Reach out via WhatsApp or email for enrollment queries."
-            phaseNumber="1"
-            phaseName="Contact & Support"
-            breadcrumbs={[{ label: 'Home', to: '/' }, { label: 'Contact' }]}
-          />
+          <RouteSuspense>
+            <ContactPage />
+          </RouteSuspense>
+        ),
+      },
+      {
+        path: 'faq',
+        element: (
+          <RouteSuspense>
+            <FAQPage />
+          </RouteSuspense>
         ),
       },
       {
         path: 'terms',
         element: (
-          <PhasePlaceholder
-            title="Terms of Enrollment"
-            subtitle="Bootcamp policies, refund schedules, and classroom code of conduct."
-            phaseNumber="1"
-            phaseName="Policies & Terms"
-            breadcrumbs={[{ label: 'Home', to: '/' }, { label: 'Terms' }]}
-          />
+          <RouteSuspense>
+            <TermsPage />
+          </RouteSuspense>
         ),
       },
       {
         path: 'privacy',
         element: (
-          <PhasePlaceholder
-            title="Privacy Policy"
-            subtitle="How student data and payment proofs are handled securely."
-            phaseNumber="1"
-            phaseName="Privacy Policy"
-            breadcrumbs={[{ label: 'Home', to: '/' }, { label: 'Privacy' }]}
-          />
+          <RouteSuspense>
+            <PrivacyPage />
+          </RouteSuspense>
         ),
+      },
+      {
+        path: 'refunds',
+        element: (
+          <RouteSuspense>
+            <RefundPolicyPage />
+          </RouteSuspense>
+        ),
+      },
+      {
+        path: 'admissions',
+        element: <Navigate to="/courses" replace />,
+      },
+      {
+        path: 'pricing',
+        element: <Navigate to="/#tuition" replace />,
       },
     ],
   },
@@ -123,7 +155,9 @@ export const router = createBrowserRouter([
     path: '/enroll/:courseId',
     element: (
       <ProtectedRoute>
-        <EnrollmentWizardPage />
+        <RouteSuspense>
+          <EnrollmentWizardPage />
+        </RouteSuspense>
       </ProtectedRoute>
     ),
   },
@@ -133,7 +167,9 @@ export const router = createBrowserRouter([
     path: '/student/quizzes/:quizId/take',
     element: (
       <ProtectedRoute>
-        <StudentQuizPage />
+        <RouteSuspense>
+          <StudentQuizPage />
+        </RouteSuspense>
       </ProtectedRoute>
     ),
   },
@@ -143,7 +179,9 @@ export const router = createBrowserRouter([
     path: '/login',
     element: (
       <GuestRoute>
-        <LoginPage />
+        <RouteSuspense>
+          <LoginPage />
+        </RouteSuspense>
       </GuestRoute>
     ),
   },
@@ -151,7 +189,9 @@ export const router = createBrowserRouter([
     path: '/register',
     element: (
       <GuestRoute>
-        <RegisterPage />
+        <RouteSuspense>
+          <RegisterPage />
+        </RouteSuspense>
       </GuestRoute>
     ),
   },
@@ -159,7 +199,9 @@ export const router = createBrowserRouter([
     path: '/forgot-password',
     element: (
       <GuestRoute>
-        <ForgotPasswordPage />
+        <RouteSuspense>
+          <ForgotPasswordPage />
+        </RouteSuspense>
       </GuestRoute>
     ),
   },
@@ -167,12 +209,14 @@ export const router = createBrowserRouter([
     path: '/reset-password',
     element: (
       <GuestRoute>
-        <ResetPasswordPage />
+        <RouteSuspense>
+          <ResetPasswordPage />
+        </RouteSuspense>
       </GuestRoute>
     ),
   },
 
-  // Student Portal Route Group (Protected)
+  // Student Workspace (Protected, Student role)
   {
     path: '/student',
     element: (
@@ -181,83 +225,118 @@ export const router = createBrowserRouter([
       </ProtectedRoute>
     ),
     children: [
-      { index: true, element: <Navigate to="/student/dashboard" replace /> },
+      {
+        index: true,
+        element: <Navigate to="/student/dashboard" replace />,
+      },
       {
         path: 'dashboard',
-        element: <StudentDashboardPage />,
+        element: (
+          <RouteSuspense>
+            <StudentDashboardPage />
+          </RouteSuspense>
+        ),
       },
       {
         path: 'courses',
-        element: <MyEnrollmentsPage />,
+        element: (
+          <RouteSuspense>
+            <StudentDashboardPage />
+          </RouteSuspense>
+        ),
       },
       {
-        path: 'courses/:courseId',
-        element: <StudentCourseSpacePage />,
+        path: 'courses/:id',
+        element: (
+          <RouteSuspense>
+            <StudentCourseSpacePage />
+          </RouteSuspense>
+        ),
+      },
+      {
+        path: 'courses/:id/learn',
+        element: (
+          <RouteSuspense>
+            <StudentCourseSpacePage />
+          </RouteSuspense>
+        ),
       },
       {
         path: 'schedule',
-        element: <StudentScheduleRouter />,
-      },
-      {
-        path: 'grades',
-        element: <StudentGradesPage />,
-      },
-      {
-        path: 'courses/:courseId/grades',
-        element: <StudentGradesPage />,
-      },
-      {
-        path: 'notifications',
-        element: <NotificationsPage />,
+        element: (
+          <RouteSuspense>
+            <StudentScheduleRouter />
+          </RouteSuspense>
+        ),
       },
       {
         path: 'assignments',
         element: (
-          <PhasePlaceholder
-            title="Assignments & Code Submissions"
-            subtitle="Submit homework files (PDF/ZIP up to 50MB) and view instructor grades."
-            phaseNumber="3"
-            phaseName="Assignments & Grading"
-            breadcrumbs={[{ label: 'Portal', to: '/student/dashboard' }, { label: 'Assignments' }]}
-          />
+          <RouteSuspense>
+            <StudentCourseSpacePage />
+          </RouteSuspense>
         ),
       },
       {
         path: 'quizzes',
         element: (
-          <PhasePlaceholder
-            title="Knowledge Checks & Quizzes"
-            subtitle="Multiple choice and timed coding questions."
-            phaseNumber="3"
-            phaseName="Quizzes Engine"
-            breadcrumbs={[{ label: 'Portal', to: '/student/dashboard' }, { label: 'Quizzes' }]}
-          />
-        ),
-      },
-      {
-        path: 'notes',
-        element: (
-          <PhasePlaceholder
-            title="Lecture Notes & Materials"
-            subtitle="PDF notes, code snippets, and session cheatsheets."
-            phaseNumber="2.5"
-            phaseName="R2 Storage & Notes"
-            breadcrumbs={[{ label: 'Portal', to: '/student/dashboard' }, { label: 'Notes' }]}
-          />
+          <RouteSuspense>
+            <StudentCourseSpacePage />
+          </RouteSuspense>
         ),
       },
       {
         path: 'payments',
-        element: <MyEnrollmentsPage />,
+        element: (
+          <RouteSuspense>
+            <MyEnrollmentsPage />
+          </RouteSuspense>
+        ),
+      },
+      {
+        path: 'grades',
+        element: (
+          <RouteSuspense>
+            <StudentGradesPage />
+          </RouteSuspense>
+        ),
+      },
+      {
+        path: 'announcements',
+        element: (
+          <RouteSuspense>
+            <NotificationsPage />
+          </RouteSuspense>
+        ),
+      },
+      {
+        path: 'notifications',
+        element: (
+          <RouteSuspense>
+            <NotificationsPage />
+          </RouteSuspense>
+        ),
+      },
+      {
+        path: 'materials',
+        element: (
+          <RouteSuspense>
+            <StudentCourseSpacePage />
+          </RouteSuspense>
+        ),
       },
       {
         path: 'profile',
-        element: <ProfilePage />,
+        element: (
+          <RouteSuspense>
+            <ProfilePage />
+          </RouteSuspense>
+        ),
       },
     ],
   },
 
-  // Admin Portal Route Group (Protected & Role Guarded to 'admin' only)
+  // Admin Workspace (Protected, Admin role)
   {
     path: '/admin',
     element: (
@@ -268,142 +347,247 @@ export const router = createBrowserRouter([
       </ProtectedRoute>
     ),
     children: [
-      { index: true, element: <Navigate to="/admin/dashboard" replace /> },
+      {
+        index: true,
+        element: <Navigate to="/admin/dashboard" replace />,
+      },
       {
         path: 'dashboard',
-        element: <AdminDashboardPage />,
+        element: (
+          <RouteSuspense>
+            <AdminDashboardPage />
+          </RouteSuspense>
+        ),
       },
       {
         path: 'analytics',
         element: (
-          <PhasePlaceholder
-            title="Cohort Analytics & Attendance Insights"
-            subtitle="Completion rates, drop-off tracking, and submission turnaround."
-            phaseNumber="4"
-            phaseName="Analytics & Insights"
-            breadcrumbs={[{ label: 'Admin', to: '/admin/dashboard' }, { label: 'Analytics' }]}
-          />
+          <RouteSuspense>
+            <AdminDashboardPage />
+          </RouteSuspense>
         ),
       },
       {
         path: 'today',
-        element: <AdminTodayPage />,
+        element: (
+          <RouteSuspense>
+            <AdminTodayPage />
+          </RouteSuspense>
+        ),
       },
       {
         path: 'courses',
-        element: <AdminCoursesPage />,
+        element: (
+          <RouteSuspense>
+            <AdminCoursesPage />
+          </RouteSuspense>
+        ),
       },
       {
         path: 'courses/new',
-        element: <AdminCourseEditorPage />,
+        element: (
+          <RouteSuspense>
+            <AdminCourseEditorPage isNew />
+          </RouteSuspense>
+        ),
       },
       {
         path: 'courses/:id/edit',
-        element: <AdminCourseEditorPage />,
+        element: (
+          <RouteSuspense>
+            <AdminCourseEditorPage />
+          </RouteSuspense>
+        ),
       },
       {
         path: 'courses/:id/sessions',
-        element: <AdminSessionsPage />,
+        element: (
+          <RouteSuspense>
+            <AdminSessionsPage />
+          </RouteSuspense>
+        ),
       },
       {
         path: 'sessions',
-        element: <AdminSessionsPage />,
+        element: (
+          <RouteSuspense>
+            <AdminSessionsPage />
+          </RouteSuspense>
+        ),
+      },
+      {
+        path: 'courses/:id/quizzes',
+        element: (
+          <RouteSuspense>
+            <AdminQuizzesPage />
+          </RouteSuspense>
+        ),
+      },
+      {
+        path: 'courses/:id/quizzes/new',
+        element: (
+          <RouteSuspense>
+            <AdminQuizBuilderPage isNew />
+          </RouteSuspense>
+        ),
+      },
+      {
+        path: 'courses/:courseId/quizzes/:quizId/edit',
+        element: (
+          <RouteSuspense>
+            <AdminQuizBuilderPage />
+          </RouteSuspense>
+        ),
       },
       {
         path: 'tasks',
-        element: <AdminQuizzesPage />,
-      },
-      {
-        path: 'quizzes',
-        element: <AdminQuizzesPage />,
-      },
-      {
-        path: 'quizzes/:id/builder',
-        element: <AdminQuizBuilderPage />,
+        element: (
+          <RouteSuspense>
+            <AdminQuizzesPage />
+          </RouteSuspense>
+        ),
       },
       {
         path: 'assignments',
-        element: <AdminAssignmentsPage />,
+        element: (
+          <RouteSuspense>
+            <AdminAssignmentsPage />
+          </RouteSuspense>
+        ),
       },
       {
         path: 'courses/:id/assignments',
-        element: <AdminAssignmentsPage />,
-      },
-      {
-        path: 'assignments/:id/grade',
-        element: <AdminGradingSplitPage />,
-      },
-      {
-        path: 'materials',
         element: (
-          <PhasePlaceholder
-            title="Lecture Notes & Resource Uploads"
-            subtitle="Upload PDFs (max 20MB) to private Cloudflare R2 bucket."
-            phaseNumber="2.5"
-            phaseName="Storage & Resource Distribution"
-            breadcrumbs={[{ label: 'Admin', to: '/admin/dashboard' }, { label: 'Notes & Files' }]}
-          />
+          <RouteSuspense>
+            <AdminAssignmentsPage />
+          </RouteSuspense>
+        ),
+      },
+      {
+        path: 'assignments/:id/grading',
+        element: (
+          <RouteSuspense>
+            <AdminGradingSplitPage />
+          </RouteSuspense>
         ),
       },
       {
         path: 'students',
-        element: <AdminStudentsPage />,
+        element: (
+          <RouteSuspense>
+            <AdminStudentsPage />
+          </RouteSuspense>
+        ),
       },
       {
         path: 'students/:id',
-        element: <AdminStudentDetailPage />,
+        element: (
+          <RouteSuspense>
+            <AdminStudentDetailPage />
+          </RouteSuspense>
+        ),
+      },
+      {
+        path: 'messages',
+        element: (
+          <RouteSuspense>
+            <AdminMessagesPage />
+          </RouteSuspense>
+        ),
       },
       {
         path: 'announcements',
-        element: <AdminAnnouncementsPage />,
+        element: (
+          <RouteSuspense>
+            <AdminAnnouncementsPage />
+          </RouteSuspense>
+        ),
       },
       {
         path: 'courses/:id/announcements',
-        element: <AdminAnnouncementsPage />,
+        element: (
+          <RouteSuspense>
+            <AdminAnnouncementsPage />
+          </RouteSuspense>
+        ),
       },
       {
         path: 'gradebook',
-        element: <AdminGradebookPage />,
+        element: (
+          <RouteSuspense>
+            <AdminGradebookPage />
+          </RouteSuspense>
+        ),
       },
       {
         path: 'courses/:id/gradebook',
-        element: <AdminGradebookPage />,
+        element: (
+          <RouteSuspense>
+            <AdminGradebookPage />
+          </RouteSuspense>
+        ),
       },
       {
         path: 'notifications',
-        element: <NotificationsPage />,
+        element: (
+          <RouteSuspense>
+            <NotificationsPage />
+          </RouteSuspense>
+        ),
       },
       {
         path: 'enrollments',
-        element: <AdminEnrollmentsPage />,
+        element: (
+          <RouteSuspense>
+            <AdminEnrollmentsPage />
+          </RouteSuspense>
+        ),
       },
       {
         path: 'attendance',
-        element: <AdminSessionsPage />,
+        element: (
+          <RouteSuspense>
+            <AdminSessionsPage />
+          </RouteSuspense>
+        ),
       },
       {
         path: 'payments',
-        element: <AdminEnrollmentsPage />,
+        element: (
+          <RouteSuspense>
+            <AdminEnrollmentsPage />
+          </RouteSuspense>
+        ),
       },
       {
         path: 'ledger',
         element: (
-          <PhasePlaceholder
-            title="Financial Ledger & Revenue"
-            subtitle="Detailed accounting of all cohort collections in PKR."
-            phaseNumber="4"
-            phaseName="Revenue Ledger & Export"
-            breadcrumbs={[{ label: 'Admin', to: '/admin/dashboard' }, { label: 'Financial Ledger' }]}
-          />
+          <RouteSuspense>
+            <PhasePlaceholder
+              title="Financial Ledger & Revenue"
+              subtitle="Detailed accounting of all cohort collections in PKR."
+              phaseNumber="4"
+              phaseName="Revenue Ledger & Export"
+              breadcrumbs={[{ label: 'Admin', to: '/admin/dashboard' }, { label: 'Financial Ledger' }]}
+            />
+          </RouteSuspense>
         ),
       },
       {
         path: 'settings',
-        element: <AdminSettingsPage />,
+        element: (
+          <RouteSuspense>
+            <AdminSettingsPage />
+          </RouteSuspense>
+        ),
       },
       {
         path: 'profile',
-        element: <ProfilePage />,
+        element: (
+          <RouteSuspense>
+            <ProfilePage />
+          </RouteSuspense>
+        ),
       },
     ],
   },
@@ -411,13 +595,21 @@ export const router = createBrowserRouter([
   // Dev Styleguide
   {
     path: '/dev/styleguide',
-    element: <StyleguidePage />,
+    element: (
+      <RouteSuspense>
+        <StyleguidePage />
+      </RouteSuspense>
+    ),
   },
 
   // Catch-all 404
   {
     path: '*',
-    element: <NotFoundPage />,
+    element: (
+      <RouteSuspense>
+        <NotFoundPage />
+      </RouteSuspense>
+    ),
   },
 ]);
 

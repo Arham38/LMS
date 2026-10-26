@@ -21,6 +21,7 @@ import {
   User,
   Megaphone,
   Award,
+  MessageSquare,
 } from 'lucide-react';
 import { Wordmark } from '../../config/brand';
 import { useAuth } from '../../context/AuthContext';
@@ -75,6 +76,7 @@ export const AdminLayout = () => {
     {
       group: 'People',
       items: [
+        { label: 'Inquiries', to: '/admin/messages', icon: MessageSquare },
         { label: 'All Students', to: '/admin/students', icon: Users },
         {
           label: 'Enrollment Requests',

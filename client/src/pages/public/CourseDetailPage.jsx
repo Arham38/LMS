@@ -15,6 +15,7 @@ import {
 import courseService from '../../services/course.service';
 import { useAuth } from '../../context/AuthContext';
 import { Badge, Button, Card, CardContent, Skeleton, Breadcrumbs } from '../../components/ui';
+import { useDocumentMeta, generateCourseSchema } from '../../utils/seo';
 
 export const CourseDetailPage = () => {
   const { slug } = useParams();
@@ -25,6 +26,20 @@ export const CourseDetailPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [expandedModule, setExpandedModule] = useState(0);
+
+  useDocumentMeta({
+    title: course ? course.title : 'Loading Course...',
+    description: course ? course.tagline : 'Live cohort details and syllabus breakdown.',
+    canonicalPath: `/courses/${slug}`,
+    jsonLd: course
+      ? generateCourseSchema({
+          title: course.title,
+          description: course.tagline,
+          fee: course.fee,
+          startDate: course.startDate,
+        })
+      : null,
+  });
 
   useEffect(() => {
     const fetchCourse = async () => {
@@ -328,6 +343,25 @@ export const CourseDetailPage = () => {
           </div>
         </div>
       </div>
+
+      {/* Sticky Mobile Enrollment Bar (Mobile Viewport Only) */}
+      {course && (
+        <div className="fixed bottom-0 left-0 right-0 z-40 bg-surface/95 backdrop-blur-md border-t border-line px-4 py-3 sm:hidden shadow-lg flex items-center justify-between gap-3">
+          <div>
+            <span className="text-[10px] text-ink-muted font-mono uppercase block">Tuition</span>
+            <span className="font-serif font-bold text-base text-ink">{formatPKR(course.fee)}</span>
+          </div>
+          <Button
+            variant={isFull || !course.isEnrollmentOpen ? 'secondary' : 'primary'}
+            size="sm"
+            disabled={isFull || !course.isEnrollmentOpen}
+            onClick={handleEnrollClick}
+            rightIcon={ArrowRight}
+          >
+            {isFull ? 'Cohort Full' : !course.isEnrollmentOpen ? 'Closed' : 'Enroll Now'}
+          </Button>
+        </div>
+      )}
     </div>
   );
 };

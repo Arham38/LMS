@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { Menu, X, ArrowUpRight, User, LogOut, LayoutDashboard, ChevronDown } from 'lucide-react';
 import { Wordmark, BRAND_NAME, TAGLINE, SUPPORT_EMAIL, WHATSAPP_NUMBER } from '../../config/brand';
+import { siteContent } from '../../content/site';
 import { useAuth } from '../../context/AuthContext';
 import Button from '../ui/Button';
 import Avatar from '../ui/Avatar';
@@ -14,9 +15,11 @@ export const PublicLayout = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navLinks = [
-    { label: 'Bootcamps', to: '/courses' },
+    { label: 'Courses', to: '/courses' },
+    { label: 'Syllabus', to: '/#syllabus' },
+    { label: 'How It Works', to: '/#how-it-works' },
+    { label: 'FAQ', to: '/faq' },
     { label: 'About', to: '/about' },
-    { label: 'Admissions', to: '/admissions' },
     { label: 'Contact', to: '/contact' },
   ];
 
@@ -108,11 +111,11 @@ export const PublicLayout = () => {
                   to="/login"
                   className="text-sm font-medium text-ink-muted hover:text-ink transition-colors px-2 py-1"
                 >
-                  Sign In
+                  {siteContent.nav.loginText}
                 </Link>
-                <Link to="/register">
+                <Link to="/courses">
                   <Button variant="primary" size="sm">
-                    Apply Now
+                    {siteContent.nav.ctaText}
                   </Button>
                 </Link>
               </>
@@ -180,14 +183,14 @@ export const PublicLayout = () => {
                     onClick={() => setMobileMenuOpen(false)}
                     className="w-full text-center py-2 text-sm font-medium text-ink border border-line rounded"
                   >
-                    Sign In
+                    {siteContent.nav.loginText}
                   </Link>
                   <Link
-                    to="/register"
+                    to="/courses"
                     onClick={() => setMobileMenuOpen(false)}
                     className="w-full text-center py-2 text-sm font-medium text-surface bg-primary rounded"
                   >
-                    Apply Now
+                    {siteContent.nav.ctaText}
                   </Link>
                 </>
               )}
@@ -204,65 +207,54 @@ export const PublicLayout = () => {
       {/* Footer */}
       <footer className="border-t border-line bg-surface pt-16 pb-12 mt-20">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-8 mb-12">
+          <div className="grid grid-cols-2 md:grid-cols-6 gap-8 mb-12">
             <div className="col-span-2">
               <Wordmark className="mb-3" />
               <p className="text-xs text-ink-muted leading-relaxed max-w-sm mb-4">
-                {TAGLINE}
+                {siteContent.brand.tagline}
               </p>
               <div className="text-xs text-ink-muted space-y-1">
-                <p>Support: <a href={`mailto:${SUPPORT_EMAIL}`} className="underline text-ink">{SUPPORT_EMAIL}</a></p>
-                <p>WhatsApp: <span className="tabular-nums font-mono text-ink">{WHATSAPP_NUMBER}</span></p>
-                <p>Time Zone: <span className="text-ink">Asia/Karachi (PKT)</span></p>
+                <p>Support: <a href={`mailto:${siteContent.brand.supportEmail}`} className="underline text-ink">{siteContent.brand.supportEmail}</a></p>
+                <p>WhatsApp: <a href={`https://wa.me/${siteContent.brand.whatsappDigits}`} target="_blank" rel="noopener noreferrer" className="tabular-nums font-mono text-ink underline">{siteContent.brand.whatsappDisplay}</a></p>
+                <p>Timezone: <span className="text-ink">{siteContent.brand.timezone}</span></p>
               </div>
             </div>
 
-            <div>
-              <h4 className="text-xs font-semibold uppercase tracking-wider text-ink mb-3">
-                Bootcamps
-              </h4>
-              <ul className="space-y-2 text-xs text-ink-muted">
-                <li><Link to="/courses/mern" className="hover:text-ink transition-colors">MERN Full-Stack</Link></li>
-                <li><Link to="/courses/python" className="hover:text-ink transition-colors">Python for Engineers</Link></li>
-                <li><Link to="/courses/aiml" className="hover:text-ink transition-colors">Applied AI & Deep Learning</Link></li>
-                <li><Link to="/courses" className="hover:text-ink transition-colors">Cohort Calendar</Link></li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="text-xs font-semibold uppercase tracking-wider text-ink mb-3">
-                Admissions
-              </h4>
-              <ul className="space-y-2 text-xs text-ink-muted">
-                <li><Link to="/admissions" className="hover:text-ink transition-colors">How to Enroll</Link></li>
-                <li><Link to="/pricing" className="hover:text-ink transition-colors">Fee & Payment Plans</Link></li>
-                <li><Link to="/faq" className="hover:text-ink transition-colors">Frequently Asked Questions</Link></li>
-                <li><Link to="/login" className="hover:text-ink transition-colors">Student Portal</Link></li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="text-xs font-semibold uppercase tracking-wider text-ink mb-3">
-                Payment Methods
-              </h4>
-              <ul className="space-y-2 text-xs text-ink-muted">
-                <li><span>JazzCash Transfer</span></li>
-                <li><span>Easypaisa Transfer</span></li>
-                <li><span>Direct Bank Transfer (IBFT)</span></li>
-                <li><span className="text-primary font-medium">Standard PKR pricing</span></li>
-              </ul>
-            </div>
+            {siteContent.footer.groups.map((group) => (
+              <div key={group.title}>
+                <h4 className="text-xs font-semibold uppercase tracking-wider text-ink mb-3 font-mono">
+                  {group.title}
+                </h4>
+                <ul className="space-y-2 text-xs text-ink-muted">
+                  {group.links.map((link) => (
+                    <li key={link.label}>
+                      {link.href.startsWith('http') || link.href.startsWith('mailto:') ? (
+                        <a
+                          href={link.href}
+                          target={link.href.startsWith('http') ? '_blank' : undefined}
+                          rel={link.href.startsWith('http') ? 'noopener noreferrer' : undefined}
+                          className="hover:text-ink transition-colors"
+                        >
+                          {link.label}
+                        </a>
+                      ) : (
+                        <Link to={link.href} className="hover:text-ink transition-colors">
+                          {link.label}
+                        </Link>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
           </div>
 
           <div className="border-t border-line pt-6 flex flex-col md:flex-row items-center justify-between text-xs text-ink-muted gap-4">
-            <p>© {new Date().getFullYear()} {BRAND_NAME}. All rights reserved.</p>
+            <p>{siteContent.footer.copyright}</p>
             <div className="flex items-center space-x-6">
-              <Link to="/terms" className="hover:text-ink transition-colors">Terms of Enrollment</Link>
+              <Link to="/terms" className="hover:text-ink transition-colors">Terms of Service</Link>
               <Link to="/privacy" className="hover:text-ink transition-colors">Privacy Policy</Link>
-              <Link to="/dev/styleguide" className="text-accent hover:underline flex items-center gap-1 font-mono">
-                <span>UI Styleguide</span>
-                <ArrowUpRight className="w-3 h-3" />
-              </Link>
+              <Link to="/refunds" className="hover:text-ink transition-colors">Refund Policy</Link>
             </div>
           </div>
         </div>

@@ -60,6 +60,11 @@ import {
   updateStudentNotesAdmin,
 } from '../controllers/adminStudent.controller.js';
 import {
+  getAdminMessages,
+  updateMessageStatus,
+  deleteContactMessage,
+} from '../controllers/contact.controller.js';
+import {
   getCourseGradebookAdmin,
   exportCourseGradebookCSVAdmin,
 } from '../controllers/gradebook.controller.js';
@@ -90,6 +95,7 @@ import {
   updateStudentStatusSchema,
   updateStudentNotesSchema,
 } from '../validators/announcement.validator.js';
+import { updateContactMessageSchema } from '../validators/contact.validator.js';
 import { sendSuccess } from '../utils/response.js';
 
 const router = Router();
@@ -193,5 +199,10 @@ router.patch('/enrollments/:id', validateBody(adminReviewEnrollmentSchema), revi
 // Settings Management
 router.get('/settings', getAdminSettings);
 router.put('/settings', validateBody(updateSettingsSchema), updateAdminSettings);
+
+// Contact Inquiries Management
+router.get('/messages', getAdminMessages);
+router.patch('/messages/:id', validateBody(updateContactMessageSchema), updateMessageStatus);
+router.delete('/messages/:id', deleteContactMessage);
 
 export default router;

@@ -21,6 +21,7 @@ const notificationSchema = new mongoose.Schema(
         'assignment_published',
         'quiz_published',
         'announcement_created',
+        'contact_message',
         'general',
       ],
       default: 'general',

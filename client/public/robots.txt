@@ -1,0 +1,19 @@
+# CodeCraft Academy Robots Policy
+User-agent: *
+Allow: /
+Allow: /courses
+Allow: /about
+Allow: /faq
+Allow: /contact
+Allow: /terms
+Allow: /privacy
+Allow: /refunds
+
+# Disallow private application routes
+Disallow: /admin
+Disallow: /admin/*
+Disallow: /student
+Disallow: /student/*
+Disallow: /api/
+
+Sitemap: https://codecraft.pk/sitemap.xml

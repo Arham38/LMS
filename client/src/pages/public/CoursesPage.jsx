@@ -3,11 +3,18 @@ import { Link } from 'react-router-dom';
 import { Calendar, Clock, CreditCard, Users, ArrowRight, AlertCircle, RefreshCw } from 'lucide-react';
 import courseService from '../../services/course.service';
 import { Card, CardHeader, CardContent, CardFooter, Badge, Button, Skeleton } from '../../components/ui';
+import { useDocumentMeta } from '../../utils/seo';
 
 export const CoursesPage = () => {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  useDocumentMeta({
+    title: 'Available Software Bootcamps & Cohorts',
+    description: 'Explore live software engineering cohorts in full-stack web development. Rigorous curriculum, live code reviews, and small cohort sizes.',
+    canonicalPath: '/courses',
+  });
 
   const fetchCourses = async () => {
     setLoading(true);
