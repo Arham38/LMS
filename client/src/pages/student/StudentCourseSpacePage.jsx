@@ -24,6 +24,7 @@ import enrollmentService from '../../services/enrollment.service';
 import sessionService from '../../services/session.service';
 import storageService from '../../services/storage.service';
 import quizService from '../../services/quiz.service';
+import assignmentService from '../../services/assignment.service';
 import {
   PageHeader,
   Card,
@@ -35,6 +36,11 @@ import {
   Spinner,
   EmptyState,
   Skeleton,
+  FormField,
+  Input,
+  Textarea,
+  Modal,
+  FileUploader,
   useToast,
 } from '../../components/ui';
 
@@ -49,6 +55,7 @@ export const StudentCourseSpacePage = () => {
   const [course, setCourse] = useState(null);
   const [sessions, setSessions] = useState([]);
   const [quizzes, setQuizzes] = useState([]);
+  const [assignments, setAssignments] = useState([]);
   const [attendanceData, setAttendanceData] = useState({
     attended: 0,
     totalCompleted: 0,
@@ -59,6 +66,17 @@ export const StudentCourseSpacePage = () => {
   const [loading, setLoading] = useState(true);
   const [joiningSessionId, setJoiningSessionId] = useState(null);
   const [downloadingKey, setDownloadingKey] = useState(null);
+  const [downloadingSubmissionKey, setDownloadingSubmissionKey] = useState(null);
+
+  // Student Homework Submission Modal State
+  const [submitModalOpen, setSubmitModalOpen] = useState(false);
+  const [submittingAssignment, setSubmittingAssignment] = useState(null);
+  const [submissionForm, setSubmissionForm] = useState({
+    fileKey: '',
+    link: '',
+    comment: '',
+  });
+  const [submittingSolution, setSubmittingSolution] = useState(false);
 
   // Live countdown state
   const [now, setNow] = useState(new Date());
@@ -77,11 +95,12 @@ export const StudentCourseSpacePage = () => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const [enrollments, sessionsRes, attendanceRes, quizzesRes] = await Promise.all([
+      const [enrollments, sessionsRes, attendanceRes, quizzesRes, assignmentsRes] = await Promise.all([
         enrollmentService.getMyEnrollments(),
         sessionService.getCourseSessionsStudent(courseId),
         sessionService.getMyCourseAttendanceStudent(courseId),
         quizService.getCourseQuizzesStudent(courseId),
+        assignmentService.getCourseAssignmentsStudent(courseId),
       ]);
 
       // Verify student has an approved enrollment for this course
@@ -100,6 +119,7 @@ export const StudentCourseSpacePage = () => {
 
       setSessions(sessionsRes.items || []);
       setQuizzes(quizzesRes.items || []);
+      setAssignments(assignmentsRes.items || []);
       if (attendanceRes) {
         setAttendanceData(attendanceRes);
       }
@@ -237,6 +257,85 @@ export const StudentCourseSpacePage = () => {
     return days;
   };
 
+  const handleOpenSubmitModal = (assignment) => {
+    setSubmittingAssignment(assignment);
+    const existing = assignment.mySubmission;
+    setSubmissionForm({
+      fileKey: existing?.fileKey || '',
+      link: existing?.link || '',
+      comment: '',
+    });
+    setSubmitModalOpen(true);
+  };
+
+  const handleSubmitSolution = async (e) => {
+    e.preventDefault();
+    if (!submittingAssignment) return;
+
+    const { submissionType } = submittingAssignment;
+    if (submissionType === 'file' && !submissionForm.fileKey) {
+      toast.error('Please upload your project ZIP or PDF file.');
+      return;
+    }
+    if (submissionType === 'link' && !submissionForm.link) {
+      toast.error('Please provide a repository or project link URL.');
+      return;
+    }
+    if (submissionType === 'either' && !submissionForm.fileKey && !submissionForm.link) {
+      toast.error('Please either upload a file or provide a project link.');
+      return;
+    }
+
+    setSubmittingSolution(true);
+    try {
+      await assignmentService.submitSolution(submittingAssignment._id, {
+        fileKey: submissionForm.fileKey || null,
+        link: submissionForm.link || null,
+        comment: submissionForm.comment.trim(),
+      });
+
+      toast.success('Homework solution submitted successfully!');
+      setSubmitModalOpen(false);
+
+      // Refresh assignments
+      const res = await assignmentService.getCourseAssignmentsStudent(courseId);
+      setAssignments(res.items || []);
+    } catch (err) {
+      toast.error(err.message || 'Failed to submit solution.');
+    } finally {
+      setSubmittingSolution(false);
+    }
+  };
+
+  const handleDownloadSubmissionFile = async (key) => {
+    if (!key) return;
+    setDownloadingSubmissionKey(key);
+    try {
+      const res = await storageService.getFileUrl(key);
+      const url = res.downloadUrl || res.url;
+      if (url) {
+        window.open(url, '_blank');
+      } else {
+        toast.error('Download link could not be generated.');
+      }
+    } catch (err) {
+      toast.error(err.message || 'Failed to download submission file.');
+    } finally {
+      setDownloadingSubmissionKey(null);
+    }
+  };
+
+  const getCountdownString = (dueAt) => {
+    const diff = new Date(dueAt).getTime() - now.getTime();
+    if (diff <= 0) return 'Deadline passed';
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    if (days > 0) return `${days}d ${hours}h remaining`;
+    if (hours > 0) return `${hours}h ${mins}m remaining`;
+    return `${mins}m remaining`;
+  };
+
   if (loading) {
     return (
       <div className="space-y-6">
@@ -339,8 +438,8 @@ export const StudentCourseSpacePage = () => {
           >
             <FileCheck2 className="w-3.5 h-3.5" />
             <span>Assignments</span>
-            <span className="text-[10px] text-ink-muted bg-surface-alt px-1.5 py-0.2 rounded">
-              Phase 5
+            <span className="text-[10px] bg-primary-soft text-primary px-1.5 py-0.2 rounded font-mono">
+              {assignments.length}
             </span>
           </button>
 
@@ -837,11 +936,358 @@ export const StudentCourseSpacePage = () => {
       )}
 
       {activeTab === 'assignments' && (
-        <EmptyState
-          icon={FileCheck2}
-          title="Homework Assignments & Code Submissions"
-          description="ZIP repository uploads and instructor rubrics are built in Phase 5."
-        />
+        <div className="space-y-4">
+          {assignments.length === 0 ? (
+            <Card>
+              <CardContent className="py-12">
+                <EmptyState
+                  icon={FileCheck2}
+                  title="No Assignments Posted Yet"
+                  description="Your instructor has not yet posted any homework assignments or coding challenges for this cohort."
+                />
+              </CardContent>
+            </Card>
+          ) : (
+            assignments.map((assignment) => {
+              const mySub = assignment.mySubmission;
+              const isOverdue = new Date() > new Date(assignment.dueAt);
+              const countdown = getCountdownString(assignment.dueAt);
+
+              const getSubmissionBadge = () => {
+                if (!mySub) {
+                  if (isOverdue && !assignment.allowLate) {
+                    return <Badge variant="danger" className="text-xs">CLOSED</Badge>;
+                  }
+                  if (isOverdue && assignment.allowLate) {
+                    return <Badge variant="warning" className="text-xs">OVERDUE</Badge>;
+                  }
+                  return <Badge variant="muted" className="text-xs">NOT SUBMITTED</Badge>;
+                }
+                switch (mySub.status) {
+                  case 'graded':
+                    return <Badge variant="success" className="text-xs font-semibold">GRADED</Badge>;
+                  case 'returned':
+                    return <Badge variant="outline" className="text-xs text-primary border-primary font-semibold">RETURNED FOR REVISION</Badge>;
+                  case 'late':
+                    return <Badge variant="warning" className="text-xs">SUBMITTED LATE</Badge>;
+                  case 'submitted':
+                  default:
+                    return <Badge variant="default" className="text-xs">SUBMITTED</Badge>;
+                }
+              };
+
+              return (
+                <Card key={assignment._id} className="overflow-hidden">
+                  <CardHeader className="border-b border-line bg-surface/30 p-5">
+                    <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+                      <div className="space-y-1">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <Badge variant="outline" className="font-mono text-xs">
+                            Week {assignment.week}
+                          </Badge>
+                          <h3 className="text-base font-semibold text-ink">
+                            {assignment.title}
+                          </h3>
+                          {getSubmissionBadge()}
+                          <Badge variant="outline" className="text-xs">
+                            {assignment.submissionType === 'either'
+                              ? 'File or Link'
+                              : assignment.submissionType === 'file'
+                              ? 'ZIP / PDF File'
+                              : 'Project Link'}
+                          </Badge>
+                        </div>
+                        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-ink-muted">
+                          <span className="flex items-center gap-1 font-mono">
+                            <Clock className="w-3.5 h-3.5" />
+                            Due: {formatPKTDateTime(assignment.dueAt)} PKT
+                          </span>
+                          <span>•</span>
+                          <span className="font-mono text-primary font-medium">
+                            {countdown}
+                          </span>
+                          <span>•</span>
+                          <span>Max Marks: <strong className="font-mono text-ink">{assignment.maxMarks}</strong></span>
+                          <span>•</span>
+                          <span>
+                            {assignment.allowLate
+                              ? `Late Submissions Allowed (${assignment.latePenaltyPercent}% deduction)`
+                              : 'Strict Deadline (No Late Submissions)'}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Right Action Button */}
+                      <div>
+                        {assignment.canSubmit && (
+                          <Button
+                            variant="primary"
+                            size="sm"
+                            onClick={() => handleOpenSubmitModal(assignment)}
+                            icon={FileCheck2}
+                          >
+                            {mySub ? (mySub.status === 'returned' ? 'Resubmit Solution' : 'Update Solution') : 'Submit Solution'}
+                          </Button>
+                        )}
+                        {!assignment.canSubmit && isOverdue && !mySub && (
+                          <span className="text-xs font-medium text-danger bg-danger/10 px-3 py-1.5 rounded">
+                            Deadline Passed — Submissions Closed
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </CardHeader>
+
+                  <CardContent className="p-5 space-y-5">
+                    {/* Instructions */}
+                    {assignment.description && (
+                      <div className="text-xs text-ink leading-relaxed whitespace-pre-wrap bg-paper p-4 rounded border border-line/60">
+                        {assignment.description}
+                      </div>
+                    )}
+
+                    {/* Rubric Breakdown */}
+                    {assignment.rubric && assignment.rubric.length > 0 && (
+                      <div className="space-y-2">
+                        <span className="text-[11px] font-semibold text-ink-muted uppercase tracking-wider block">
+                          Grading Rubric
+                        </span>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
+                          {assignment.rubric.map((r, i) => (
+                            <div
+                              key={i}
+                              className="p-2.5 bg-surface rounded border border-line flex items-center justify-between text-xs"
+                            >
+                              <span className="text-ink truncate pr-2">{r.criterion}</span>
+                              <span className="font-mono font-medium text-ink-muted shrink-0">
+                                {r.maxMarks} pts
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Graded Feedback Card */}
+                    {mySub && mySub.status === 'graded' && (
+                      <div className="p-4 bg-success/5 border border-success/30 rounded-md space-y-3">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-success/20 pb-2">
+                          <div className="flex items-center gap-2">
+                            <CheckCircle2 className="w-5 h-5 text-success shrink-0" />
+                            <div>
+                              <h4 className="text-sm font-semibold text-ink">
+                                Instructor Evaluation Complete
+                              </h4>
+                              <p className="text-[11px] text-ink-muted">
+                                Graded on {formatPKTDateTime(mySub.gradedAt)} PKT
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className="text-right">
+                            <span className="text-xs text-ink-muted block">Final Score</span>
+                            <span className="font-mono text-xl font-bold text-success">
+                              {mySub.finalMarks} <span className="text-sm font-normal text-ink-muted">/ {assignment.maxMarks}</span>
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Late penalty note */}
+                        {mySub.latePenaltyApplied > 0 && (
+                          <div className="text-xs text-warning bg-warning/10 p-2 rounded border border-warning/20">
+                            <strong>Late Penalty Applied:</strong> -{mySub.latePenaltyApplied} marks ({assignment.latePenaltyPercent}% deduction applied to raw score of {mySub.marks}).
+                          </div>
+                        )}
+
+                        {/* Rubric details */}
+                        {mySub.rubricMarks && mySub.rubricMarks.length > 0 && (
+                          <div className="space-y-1.5 pt-1">
+                            <span className="text-[11px] font-semibold text-ink-muted uppercase tracking-wider block">
+                              Rubric Breakdown
+                            </span>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                              {mySub.rubricMarks.map((rm, idx) => (
+                                <div key={idx} className="flex items-center justify-between p-2 bg-paper rounded border border-line text-xs">
+                                  <span className="text-ink">{rm.criterion}</span>
+                                  <span className="font-mono font-bold text-ink">{rm.marks} pts</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Instructor Feedback */}
+                        {mySub.feedback && (
+                          <div className="pt-2">
+                            <span className="text-[11px] font-semibold text-ink-muted uppercase tracking-wider block mb-1">
+                              Instructor Feedback
+                            </span>
+                            <div className="p-3 bg-paper rounded border border-line text-xs text-ink leading-relaxed whitespace-pre-wrap font-sans">
+                              {mySub.feedback}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Returned Notice */}
+                    {mySub && mySub.status === 'returned' && (
+                      <div className="p-4 bg-primary/5 border border-primary/30 rounded-md space-y-2">
+                        <div className="flex items-center gap-2">
+                          <AlertCircle className="w-5 h-5 text-primary shrink-0" />
+                          <h4 className="text-sm font-semibold text-ink">
+                            Returned for Revision
+                          </h4>
+                        </div>
+                        <p className="text-xs text-ink-muted">
+                          Your instructor reviewed this submission and requested revisions before final grading:
+                        </p>
+                        {mySub.feedback && (
+                          <div className="p-3 bg-paper rounded border border-line text-xs text-ink italic">
+                            "{mySub.feedback}"
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Current Submission Info */}
+                    {mySub && (
+                      <div className="p-3.5 bg-surface rounded border border-line flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2">
+                            <span className="font-mono font-semibold text-ink">
+                              Submission v{mySub.version}
+                            </span>
+                            <span>•</span>
+                            <span className="text-ink-muted">
+                              Submitted {formatPKTDateTime(mySub.submittedAt)} PKT
+                            </span>
+                          </div>
+                          {mySub.comment && (
+                            <p className="text-ink-muted italic">
+                              "{mySub.comment}"
+                            </p>
+                          )}
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          {mySub.link && (
+                            <a
+                              href={mySub.link}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-paper border border-line rounded text-xs font-medium text-ink hover:border-ink/40 transition-colors"
+                            >
+                              <ExternalLink className="w-3.5 h-3.5 text-primary" />
+                              View Link
+                            </a>
+                          )}
+                          {mySub.fileKey && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleDownloadSubmissionFile(mySub.fileKey)}
+                              loading={downloadingSubmissionKey === mySub.fileKey}
+                              icon={Download}
+                            >
+                              Download Archive
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              );
+            })
+          )}
+
+          {/* Submission Modal */}
+          <Modal
+            isOpen={submitModalOpen}
+            onClose={() => setSubmitModalOpen(false)}
+            title={`Submit Solution: ${submittingAssignment?.title || 'Homework'}`}
+            size="md"
+          >
+            <form onSubmit={handleSubmitSolution} className="space-y-4">
+              <div className="p-3 bg-surface border border-line rounded text-xs text-ink-muted space-y-1">
+                <div className="flex items-center justify-between">
+                  <span>Deadline: <strong className="text-ink font-mono">{formatPKTDateTime(submittingAssignment?.dueAt)} PKT</strong></span>
+                  <span>Max Marks: <strong className="text-ink font-mono">{submittingAssignment?.maxMarks}</strong></span>
+                </div>
+                {submittingAssignment && new Date() > new Date(submittingAssignment.dueAt) && (
+                  <div className="text-warning font-medium pt-1">
+                    Late submission policy: A {submittingAssignment.latePenaltyPercent}% penalty will be deducted automatically from your final score.
+                  </div>
+                )}
+              </div>
+
+              {/* File Upload (for 'file' or 'either') */}
+              {(submittingAssignment?.submissionType === 'file' || submittingAssignment?.submissionType === 'either') && (
+                <div>
+                  <label className="block text-xs font-semibold text-ink mb-1.5">
+                    Upload Solution Archive (ZIP or PDF, max 50MB)
+                    {submittingAssignment.submissionType === 'file' && <span className="text-danger ml-0.5">*</span>}
+                  </label>
+                  <FileUploader
+                    kind="zip"
+                    accept=".zip,.pdf,application/zip,application/x-zip-compressed,application/pdf"
+                    maxSize={50 * 1024 * 1024}
+                    value={submissionForm.fileKey}
+                    onChange={(key) => setSubmissionForm({ ...submissionForm, fileKey: key })}
+                  />
+                </div>
+              )}
+
+              {/* Repository / Drive Link (for 'link' or 'either') */}
+              {(submittingAssignment?.submissionType === 'link' || submittingAssignment?.submissionType === 'either') && (
+                <FormField
+                  label="Project or Repository URL Link"
+                  required={submittingAssignment.submissionType === 'link'}
+                  helperText="Link to your GitHub repository, pull request, or Google Drive folder"
+                >
+                  <Input
+                    type="url"
+                    value={submissionForm.link}
+                    onChange={(e) => setSubmissionForm({ ...submissionForm, link: e.target.value })}
+                    placeholder="https://github.com/your-username/homework-repo"
+                    className="font-mono text-xs"
+                  />
+                </FormField>
+              )}
+
+              {/* Comments / Notes */}
+              <FormField label="Notes for Instructor (Optional)" helperText="Mention any bonus challenges completed or special instructions to run your code">
+                <Textarea
+                  rows={3}
+                  value={submissionForm.comment}
+                  onChange={(e) => setSubmissionForm({ ...submissionForm, comment: e.target.value })}
+                  placeholder="e.g. Added JWT refresh tokens and Jest integration tests..."
+                  className="text-xs"
+                />
+              </FormField>
+
+              <div className="flex items-center justify-end gap-3 pt-3 border-t border-line">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setSubmitModalOpen(false)}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  variant="primary"
+                  size="sm"
+                  loading={submittingSolution}
+                >
+                  Submit Homework
+                </Button>
+              </div>
+            </form>
+          </Modal>
+        </div>
       )}
 
       {activeTab === 'announcements' && (

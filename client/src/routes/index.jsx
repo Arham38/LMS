@@ -23,6 +23,8 @@ import AdminSessionsPage from '../pages/admin/AdminSessionsPage';
 import AdminTodayPage from '../pages/admin/AdminTodayPage';
 import AdminQuizzesPage from '../pages/admin/AdminQuizzesPage';
 import AdminQuizBuilderPage from '../pages/admin/AdminQuizBuilderPage';
+import AdminAssignmentsPage from '../pages/admin/AdminAssignmentsPage';
+import AdminGradingSplitPage from '../pages/admin/AdminGradingSplitPage';
 import StudentCourseSpacePage from '../pages/student/StudentCourseSpacePage';
 import StudentScheduleRouter from '../pages/student/StudentScheduleRouter';
 import StudentQuizPage from '../pages/student/StudentQuizPage';
@@ -314,6 +316,18 @@ export const router = createBrowserRouter([
       {
         path: 'quizzes/:id/builder',
         element: <AdminQuizBuilderPage />,
+      },
+      {
+        path: 'assignments',
+        element: <AdminAssignmentsPage />,
+      },
+      {
+        path: 'courses/:id/assignments',
+        element: <AdminAssignmentsPage />,
+      },
+      {
+        path: 'assignments/:id/grade',
+        element: <AdminGradingSplitPage />,
       },
       {
         path: 'materials',

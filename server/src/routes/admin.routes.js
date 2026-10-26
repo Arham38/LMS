@@ -36,6 +36,16 @@ import {
   getQuizResultsAdmin,
   exportQuizResultsCSVAdmin,
 } from '../controllers/quiz.controller.js';
+import {
+  getAdminAssignmentsByCourse,
+  createAssignmentAdmin,
+  getAssignmentByIdAdmin,
+  updateAssignmentAdmin,
+  deleteAssignmentAdmin,
+  getAssignmentSubmissionsAdmin,
+  gradeSubmissionAdmin,
+  exportAssignmentMarksCSVAdmin,
+} from '../controllers/assignment.controller.js';
 import { protect, authorizeRoles } from '../middleware/auth.middleware.js';
 import { validateBody } from '../middleware/validate.js';
 import { createCourseSchema, updateCourseSchema } from '../validators/course.validator.js';
@@ -52,6 +62,11 @@ import {
   updateQuizSchema,
   importPlainTextSchema,
 } from '../validators/quiz.validator.js';
+import {
+  createAssignmentSchema,
+  updateAssignmentSchema,
+  gradeSubmissionSchema,
+} from '../validators/assignment.validator.js';
 import { sendSuccess } from '../utils/response.js';
 
 const router = Router();
@@ -99,6 +114,18 @@ router.delete('/quizzes/:id', deleteQuizAdmin);
 router.post('/quizzes/:id/import', validateBody(importPlainTextSchema), importQuestionsPlainTextAdmin);
 router.get('/quizzes/:id/results', getQuizResultsAdmin);
 router.get('/quizzes/:id/export', exportQuizResultsCSVAdmin);
+
+// Course Assignments Management
+router.get('/courses/:courseId/assignments', getAdminAssignmentsByCourse);
+router.post('/courses/:courseId/assignments', validateBody(createAssignmentSchema), createAssignmentAdmin);
+
+// Assignment Details, Edit, Submissions & Grading
+router.get('/assignments/:id', getAssignmentByIdAdmin);
+router.put('/assignments/:id', validateBody(updateAssignmentSchema), updateAssignmentAdmin);
+router.delete('/assignments/:id', deleteAssignmentAdmin);
+router.get('/assignments/:id/submissions', getAssignmentSubmissionsAdmin);
+router.patch('/submissions/:id/grade', validateBody(gradeSubmissionSchema), gradeSubmissionAdmin);
+router.get('/assignments/:id/export', exportAssignmentMarksCSVAdmin);
 
 // Enrollment Management
 router.get('/enrollments', getAdminEnrollments);

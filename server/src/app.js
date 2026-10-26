@@ -18,6 +18,7 @@ import uploadRoutes from './routes/upload.routes.js';
 import fileRoutes from './routes/file.routes.js';
 import sessionRoutes from './routes/session.routes.js';
 import quizRoutes from './routes/quiz.routes.js';
+import assignmentRoutes from './routes/assignment.routes.js';
 
 const app = express();
 
@@ -71,6 +72,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/courses', courseRoutes);
 app.use('/api/sessions', sessionRoutes);
 app.use('/api', quizRoutes);
+app.use('/api', assignmentRoutes);
 app.use('/api/enrollments', enrollmentRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/admin', adminRoutes);

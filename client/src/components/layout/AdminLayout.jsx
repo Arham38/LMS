@@ -63,6 +63,7 @@ export const AdminLayout = () => {
         { label: 'Courses & Batches', to: '/admin/courses', icon: BookOpen },
         { label: 'Live Sessions', to: '/admin/sessions', icon: Video },
         { label: 'Quizzes & Tasks', to: '/admin/tasks', icon: FileCheck2 },
+        { label: 'Assignments', to: '/admin/assignments', icon: ClipboardList },
         { label: 'Notes & Materials', to: '/admin/materials', icon: FileText },
       ],
     },

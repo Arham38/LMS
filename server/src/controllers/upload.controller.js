@@ -1,6 +1,8 @@
 import { createUploadUrl, createDownloadUrl, FILE_RULES } from '../services/storage.service.js';
 import Enrollment from '../models/enrollment.model.js';
 import Session from '../models/session.model.js';
+import Assignment from '../models/assignment.model.js';
+import Submission from '../models/submission.model.js';
 import ApiError from '../utils/ApiError.js';
 import asyncHandler from '../utils/asyncHandler.js';
 import { sendSuccess } from '../utils/response.js';
@@ -69,7 +71,33 @@ export const getFileDownloadUrl = asyncHandler(async (req, res) => {
       }
     }
 
-    // 3. (Reserved for Phase 5: student assignment submissions)
+    // 3. Check if key is an assignment attachment (starter code / spec PDF)
+    if (!isAllowed) {
+      const assignmentWithAttachment = await Assignment.findOne({ attachmentKey: key });
+      if (assignmentWithAttachment) {
+        const approvedEnrollment = await Enrollment.findOne({
+          student: req.user._id,
+          course: assignmentWithAttachment.course,
+          status: 'approved',
+        });
+        if (approvedEnrollment) {
+          isAllowed = true;
+        }
+      }
+    }
+
+    // 4. Check if key is a student assignment submission file
+    if (!isAllowed) {
+      const submission = await Submission.findOne({
+        $or: [{ fileKey: key }, { 'history.fileKey': key }],
+      });
+      if (submission) {
+        // Enforce strictly: only the owner student can access their submitted homework file
+        if (submission.student.toString() === req.user._id.toString()) {
+          isAllowed = true;
+        }
+      }
+    }
   }
 
   if (!isAllowed) {
