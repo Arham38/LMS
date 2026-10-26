@@ -21,8 +21,11 @@ import AdminEnrollmentsPage from '../pages/admin/AdminEnrollmentsPage';
 import AdminSettingsPage from '../pages/admin/AdminSettingsPage';
 import AdminSessionsPage from '../pages/admin/AdminSessionsPage';
 import AdminTodayPage from '../pages/admin/AdminTodayPage';
+import AdminQuizzesPage from '../pages/admin/AdminQuizzesPage';
+import AdminQuizBuilderPage from '../pages/admin/AdminQuizBuilderPage';
 import StudentCourseSpacePage from '../pages/student/StudentCourseSpacePage';
 import StudentScheduleRouter from '../pages/student/StudentScheduleRouter';
+import StudentQuizPage from '../pages/student/StudentQuizPage';
 
 import LoginPage from '../pages/auth/LoginPage';
 import RegisterPage from '../pages/auth/RegisterPage';
@@ -111,6 +114,16 @@ export const router = createBrowserRouter([
     element: (
       <ProtectedRoute>
         <EnrollmentWizardPage />
+      </ProtectedRoute>
+    ),
+  },
+
+  // Focused Student Quiz Taking Experience (Protected)
+  {
+    path: '/student/quizzes/:quizId/take',
+    element: (
+      <ProtectedRoute>
+        <StudentQuizPage />
       </ProtectedRoute>
     ),
   },
@@ -292,15 +305,15 @@ export const router = createBrowserRouter([
       },
       {
         path: 'tasks',
-        element: (
-          <PhasePlaceholder
-            title="Quizzes & Homework Assignments"
-            subtitle="Create assessments, configure deadlines, and review student work."
-            phaseNumber="3"
-            phaseName="Quizzes & Grading Engine"
-            breadcrumbs={[{ label: 'Admin', to: '/admin/dashboard' }, { label: 'Quizzes & Tasks' }]}
-          />
-        ),
+        element: <AdminQuizzesPage />,
+      },
+      {
+        path: 'quizzes',
+        element: <AdminQuizzesPage />,
+      },
+      {
+        path: 'quizzes/:id/builder',
+        element: <AdminQuizBuilderPage />,
       },
       {
         path: 'materials',

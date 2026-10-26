@@ -26,6 +26,16 @@ import {
   updateSessionAttendanceAdmin,
   getTodaySessionsAdmin,
 } from '../controllers/session.controller.js';
+import {
+  getAdminQuizzesByCourse,
+  createQuizAdmin,
+  getQuizByIdAdmin,
+  updateQuizAdmin,
+  deleteQuizAdmin,
+  importQuestionsPlainTextAdmin,
+  getQuizResultsAdmin,
+  exportQuizResultsCSVAdmin,
+} from '../controllers/quiz.controller.js';
 import { protect, authorizeRoles } from '../middleware/auth.middleware.js';
 import { validateBody } from '../middleware/validate.js';
 import { createCourseSchema, updateCourseSchema } from '../validators/course.validator.js';
@@ -37,6 +47,11 @@ import {
   updateSessionStatusSchema,
   updateAttendanceBulkSchema,
 } from '../validators/session.validator.js';
+import {
+  createQuizSchema,
+  updateQuizSchema,
+  importPlainTextSchema,
+} from '../validators/quiz.validator.js';
 import { sendSuccess } from '../utils/response.js';
 
 const router = Router();
@@ -72,6 +87,18 @@ router.delete('/sessions/:id', deleteSessionAdmin);
 router.patch('/sessions/:id/status', validateBody(updateSessionStatusSchema), updateSessionStatusAdmin);
 router.get('/sessions/:id/attendance', getSessionAttendanceAdmin);
 router.put('/sessions/:id/attendance', validateBody(updateAttendanceBulkSchema), updateSessionAttendanceAdmin);
+
+// Course Quizzes Management
+router.get('/courses/:courseId/quizzes', getAdminQuizzesByCourse);
+router.post('/courses/:courseId/quizzes', validateBody(createQuizSchema), createQuizAdmin);
+
+// Quiz Builder, Bulk Import & Analytics
+router.get('/quizzes/:id', getQuizByIdAdmin);
+router.put('/quizzes/:id', validateBody(updateQuizSchema), updateQuizAdmin);
+router.delete('/quizzes/:id', deleteQuizAdmin);
+router.post('/quizzes/:id/import', validateBody(importPlainTextSchema), importQuestionsPlainTextAdmin);
+router.get('/quizzes/:id/results', getQuizResultsAdmin);
+router.get('/quizzes/:id/export', exportQuizResultsCSVAdmin);
 
 // Enrollment Management
 router.get('/enrollments', getAdminEnrollments);

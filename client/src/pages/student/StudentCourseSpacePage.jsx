@@ -23,6 +23,7 @@ import {
 import enrollmentService from '../../services/enrollment.service';
 import sessionService from '../../services/session.service';
 import storageService from '../../services/storage.service';
+import quizService from '../../services/quiz.service';
 import {
   PageHeader,
   Card,
@@ -47,6 +48,7 @@ export const StudentCourseSpacePage = () => {
 
   const [course, setCourse] = useState(null);
   const [sessions, setSessions] = useState([]);
+  const [quizzes, setQuizzes] = useState([]);
   const [attendanceData, setAttendanceData] = useState({
     attended: 0,
     totalCompleted: 0,
@@ -75,10 +77,11 @@ export const StudentCourseSpacePage = () => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const [enrollments, sessionsRes, attendanceRes] = await Promise.all([
+      const [enrollments, sessionsRes, attendanceRes, quizzesRes] = await Promise.all([
         enrollmentService.getMyEnrollments(),
         sessionService.getCourseSessionsStudent(courseId),
         sessionService.getMyCourseAttendanceStudent(courseId),
+        quizService.getCourseQuizzesStudent(courseId),
       ]);
 
       // Verify student has an approved enrollment for this course
@@ -96,6 +99,7 @@ export const StudentCourseSpacePage = () => {
       document.title = `${matchedEnrollment.course?.title || 'Course Space'} — CodeCraft Academy`;
 
       setSessions(sessionsRes.items || []);
+      setQuizzes(quizzesRes.items || []);
       if (attendanceRes) {
         setAttendanceData(attendanceRes);
       }
@@ -319,8 +323,8 @@ export const StudentCourseSpacePage = () => {
           >
             <HelpCircle className="w-3.5 h-3.5" />
             <span>Quizzes</span>
-            <span className="text-[10px] text-ink-muted bg-surface-alt px-1.5 py-0.2 rounded">
-              Phase 4
+            <span className="text-[10px] bg-primary-soft text-primary px-1.5 py-0.2 rounded font-mono">
+              {quizzes.length}
             </span>
           </button>
 
@@ -709,13 +713,127 @@ export const StudentCourseSpacePage = () => {
         </div>
       )}
 
-      {/* PLACEHOLDER TABS FOR UPCOMING PHASES */}
+      {/* TAB CONTENT: QUIZZES */}
       {activeTab === 'quizzes' && (
-        <EmptyState
-          icon={HelpCircle}
-          title="Interactive Quizzes Engine"
-          description="Timed multiple choice questions and algorithmic knowledge checks are built in Phase 4."
-        />
+        <div className="space-y-4">
+          <div className="flex items-center justify-between pb-1">
+            <span className="font-display font-semibold text-sm text-ink uppercase tracking-wider">
+              Knowledge Checks & Coding Quizzes
+            </span>
+            <span className="text-xs text-ink-muted">
+              Auto-graded &bull; Review released per cohort policy
+            </span>
+          </div>
+
+          {quizzes.length === 0 ? (
+            <EmptyState
+              icon={HelpCircle}
+              title="No quizzes published yet"
+              description="Your instructor has not scheduled any quizzes for this cohort yet."
+            />
+          ) : (
+            <div className="grid gap-3">
+              {quizzes.map((q) => {
+                const isPassed = q.hasPassed;
+                const hasAttempted = q.attemptsUsed > 0;
+
+                return (
+                  <Card key={q._id} className="border border-line hover:border-line-strong transition-all">
+                    <CardContent className="p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                      <div className="space-y-1.5 flex-1">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="text-[11px] font-mono text-ink-muted font-semibold bg-surface-alt px-2 py-0.5 rounded">
+                            Week {q.week}
+                          </span>
+
+                          {q.status === 'open' ? (
+                            <Badge variant="success" dot>Open</Badge>
+                          ) : q.status === 'upcoming' ? (
+                            <Badge variant="primary" dot>Upcoming</Badge>
+                          ) : (
+                            <Badge variant="neutral">Closed</Badge>
+                          )}
+
+                          {q.timeLimitMinutes ? (
+                            <span className="text-[11px] text-ink-muted flex items-center gap-1">
+                              <Clock className="w-3 h-3 text-primary" />
+                              <span>{q.timeLimitMinutes} mins</span>
+                            </span>
+                          ) : (
+                            <span className="text-[11px] text-ink-muted font-mono">Untimed</span>
+                          )}
+
+                          {hasAttempted && (
+                            isPassed ? (
+                              <Badge variant="success">Passed ({q.bestPercent}%)</Badge>
+                            ) : (
+                              <Badge variant="warning">Best: {q.bestPercent}%</Badge>
+                            )
+                          )}
+                        </div>
+
+                        <h4 className="font-display font-semibold text-base text-ink">
+                          {q.title}
+                        </h4>
+
+                        {q.instructions && (
+                          <p className="text-xs text-ink-muted leading-relaxed line-clamp-2">
+                            {q.instructions}
+                          </p>
+                        )}
+
+                        <div className="flex flex-wrap items-center gap-4 text-xs text-ink-muted pt-1">
+                          <span>
+                            Questions: <strong className="text-ink font-semibold">{q.questionCount}</strong>
+                          </span>
+                          <span>&bull;</span>
+                          <span>
+                            Total Marks: <strong className="text-ink font-semibold">{q.totalMarks}</strong>
+                          </span>
+                          <span>&bull;</span>
+                          <span>
+                            Passing: <strong className="text-ink font-semibold">{q.passingPercent}%</strong>
+                          </span>
+                          <span>&bull;</span>
+                          <span>
+                            Attempts Used: <strong className="text-ink">{q.attemptsUsed} of {q.maxAttempts}</strong>
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Right Action Button */}
+                      <div className="shrink-0 pt-2 md:pt-0">
+                        {q.inProgressAttemptId ? (
+                          <Link to={`/student/quizzes/${q._id}/take`}>
+                            <Button variant="primary" size="md" leftIcon={Play}>
+                              Resume Quiz
+                            </Button>
+                          </Link>
+                        ) : q.canAttempt ? (
+                          <Link to={`/student/quizzes/${q._id}/take`}>
+                            <Button variant="primary" size="md" leftIcon={Play}>
+                              {hasAttempted ? 'Retake Quiz' : 'Start Quiz'}
+                            </Button>
+                          </Link>
+                        ) : hasAttempted ? (
+                          <Link to={`/student/quizzes/${q._id}/take`}>
+                            <Button variant="secondary" size="md" leftIcon={CheckCircle2}>
+                              View Results
+                            </Button>
+                          </Link>
+                        ) : (
+                          <Button variant="secondary" size="md" disabled>
+                            {q.status === 'upcoming' ? 'Not Open Yet' : 'Quiz Closed'}
+                          </Button>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          )}
+        </div>
       )}
 
       {activeTab === 'assignments' && (

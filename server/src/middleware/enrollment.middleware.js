@@ -1,12 +1,14 @@
 import Enrollment from '../models/enrollment.model.js';
 import Session from '../models/session.model.js';
+import Quiz from '../models/quiz.model.js';
+import QuizAttempt from '../models/quizAttempt.model.js';
 import ApiError from '../utils/ApiError.js';
 import asyncHandler from '../utils/asyncHandler.js';
 
 /**
  * Middleware: requireApprovedEnrollment
  * Enforces that non-admin callers have an approved enrollment for the target course.
- * Handles both courseId in params/query and session lookup via sessionId.
+ * Handles courseId in params/query/body, and lookups via sessionId, quizId, or attemptId.
  */
 export const requireApprovedEnrollment = asyncHandler(async (req, res, next) => {
   // Admin role automatically bypasses enrollment checks
@@ -16,12 +18,27 @@ export const requireApprovedEnrollment = asyncHandler(async (req, res, next) => 
 
   let courseId = req.params.courseId || req.query.courseId || req.body?.courseId;
 
-  // If courseId is not directly in params, check if route operates on a session (e.g. /api/sessions/:id/join)
+  // 1. If courseId is not directly provided, inspect req.params.id
   if (!courseId && req.params.id) {
+    // Check Session
     const session = await Session.findById(req.params.id).select('course');
     if (session) {
       courseId = session.course;
-      req.sessionInstance = session; // Attach for controller reuse
+      req.sessionInstance = session;
+    } else {
+      // Check Quiz
+      const quiz = await Quiz.findById(req.params.id).select('course');
+      if (quiz) {
+        courseId = quiz.course;
+        req.quizInstance = quiz;
+      } else {
+        // Check QuizAttempt
+        const attempt = await QuizAttempt.findById(req.params.id).populate('quiz', 'course');
+        if (attempt && attempt.quiz) {
+          courseId = attempt.quiz.course;
+          req.attemptInstance = attempt;
+        }
+      }
     }
   }
 
@@ -37,7 +54,7 @@ export const requireApprovedEnrollment = asyncHandler(async (req, res, next) => 
 
   if (!enrollment) {
     throw ApiError.forbidden(
-      'Access denied. An approved tuition enrollment is required to view live sessions and classroom materials.',
+      'Access denied. An approved tuition enrollment is required to view classroom materials, live sessions, and quizzes.',
       'ENROLLMENT_REQUIRED'
     );
   }
