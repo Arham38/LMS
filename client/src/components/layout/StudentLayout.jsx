@@ -13,6 +13,7 @@ import {
   User,
 } from 'lucide-react';
 import { Wordmark } from '../../config/brand';
+import { useAuth } from '../../context/AuthContext';
 import Avatar from '../ui/Avatar';
 import DropdownMenu from '../ui/DropdownMenu';
 import Badge from '../ui/Badge';
@@ -20,6 +21,7 @@ import Badge from '../ui/Badge';
 export const StudentLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { user, logout } = useAuth();
 
   const [selectedCourse, setSelectedCourse] = useState('MERN Full-Stack Bootcamp (Batch 04)');
 
@@ -49,12 +51,7 @@ export const StudentLayout = () => {
   ];
 
   const handleLogout = () => {
-    try {
-      localStorage.removeItem('auth_token');
-      localStorage.removeItem('auth_user');
-    } catch {
-      // ignore
-    }
+    logout();
     navigate('/login');
   };
 
@@ -129,10 +126,10 @@ export const StudentLayout = () => {
         <div className="p-3 border-t border-line bg-surface-alt/20">
           <div className="flex items-center justify-between p-2 rounded hover:bg-surface-alt transition-colors">
             <div className="flex items-center gap-2.5 min-w-0">
-              <Avatar name="Ali Khan" size="sm" />
+              <Avatar name={user?.name || 'Student'} size="sm" />
               <div className="flex flex-col min-w-0">
-                <span className="text-xs font-semibold text-ink truncate">Ali Khan</span>
-                <span className="text-[11px] text-ink-muted truncate font-mono">ali@example.com</span>
+                <span className="text-xs font-semibold text-ink truncate">{user?.name || 'Student'}</span>
+                <span className="text-[11px] text-ink-muted truncate font-mono">{user?.email}</span>
               </div>
             </div>
             <button
@@ -175,9 +172,13 @@ export const StudentLayout = () => {
             <DropdownMenu
               align="right"
               trigger={
-                <button type="button" className="flex items-center gap-2 rounded-full focus:outline-none">
-                  <Avatar name="Ali Khan" size="sm" />
-                  <ChevronDown className="w-3.5 h-3.5 text-ink-muted hidden sm:inline stroke-[1.5]" />
+                <button type="button" className="flex items-center gap-2 rounded-full focus:outline-none p-1 hover:bg-surface-alt transition-colors">
+                  <Avatar name={user?.name || 'Student'} size="sm" />
+                  <span className="text-xs font-medium text-ink hidden sm:inline max-w-[120px] truncate">
+                    {user?.name}
+                  </span>
+                  <Badge variant="success" className="hidden md:inline-flex">Student</Badge>
+                  <ChevronDown className="w-3.5 h-3.5 text-ink-muted stroke-[1.5]" />
                 </button>
               }
               items={userMenuItems}

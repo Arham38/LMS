@@ -5,7 +5,16 @@ import PublicLayout from '../components/layout/PublicLayout';
 import StudentLayout from '../components/layout/StudentLayout';
 import AdminLayout from '../components/layout/AdminLayout';
 
+import ProtectedRoute from '../components/auth/ProtectedRoute';
+import RoleRoute from '../components/auth/RoleRoute';
+import GuestRoute from '../components/auth/GuestRoute';
+
 import HomePage from '../pages/public/HomePage';
+import LoginPage from '../pages/auth/LoginPage';
+import RegisterPage from '../pages/auth/RegisterPage';
+import ForgotPasswordPage from '../pages/auth/ForgotPasswordPage';
+import ResetPasswordPage from '../pages/auth/ResetPasswordPage';
+import ProfilePage from '../pages/profile/ProfilePage';
 import NotFoundPage from '../pages/NotFoundPage';
 import StyleguidePage from '../pages/dev/StyleguidePage';
 import PhasePlaceholder from '../pages/PhasePlaceholder';
@@ -66,30 +75,6 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: 'login',
-        element: (
-          <PhasePlaceholder
-            title="Student & Instructor Sign In"
-            subtitle="Secure authentication and account management."
-            phaseNumber="1"
-            phaseName="Authentication & Authorization"
-            breadcrumbs={[{ label: 'Home', to: '/' }, { label: 'Sign In' }]}
-          />
-        ),
-      },
-      {
-        path: 'register',
-        element: (
-          <PhasePlaceholder
-            title="Student Registration & Application"
-            subtitle="Apply for upcoming cohort and reserve your seat."
-            phaseNumber="1"
-            phaseName="Student Registration"
-            breadcrumbs={[{ label: 'Home', to: '/' }, { label: 'Register' }]}
-          />
-        ),
-      },
-      {
         path: 'terms',
         element: (
           <PhasePlaceholder
@@ -116,10 +101,48 @@ export const router = createBrowserRouter([
     ],
   },
 
-  // Student Portal Route Group
+  // Guest-only Auth Routes (Redirect to dashboard if already authenticated)
+  {
+    path: '/login',
+    element: (
+      <GuestRoute>
+        <LoginPage />
+      </GuestRoute>
+    ),
+  },
+  {
+    path: '/register',
+    element: (
+      <GuestRoute>
+        <RegisterPage />
+      </GuestRoute>
+    ),
+  },
+  {
+    path: '/forgot-password',
+    element: (
+      <GuestRoute>
+        <ForgotPasswordPage />
+      </GuestRoute>
+    ),
+  },
+  {
+    path: '/reset-password',
+    element: (
+      <GuestRoute>
+        <ResetPasswordPage />
+      </GuestRoute>
+    ),
+  },
+
+  // Student Portal Route Group (Protected)
   {
     path: '/student',
-    element: <StudentLayout />,
+    element: (
+      <ProtectedRoute>
+        <StudentLayout />
+      </ProtectedRoute>
+    ),
     children: [
       { index: true, element: <Navigate to="/student/dashboard" replace /> },
       {
@@ -208,23 +231,21 @@ export const router = createBrowserRouter([
       },
       {
         path: 'profile',
-        element: (
-          <PhasePlaceholder
-            title="Account Settings"
-            subtitle="Update contact number and change password."
-            phaseNumber="1"
-            phaseName="User Profile"
-            breadcrumbs={[{ label: 'Portal', to: '/student/dashboard' }, { label: 'Profile' }]}
-          />
-        ),
+        element: <ProfilePage />,
       },
     ],
   },
 
-  // Admin Portal Route Group
+  // Admin Portal Route Group (Protected & Role Guarded to 'admin' only)
   {
     path: '/admin',
-    element: <AdminLayout />,
+    element: (
+      <ProtectedRoute>
+        <RoleRoute allowedRoles={['admin']}>
+          <AdminLayout />
+        </RoleRoute>
+      </ProtectedRoute>
+    ),
     children: [
       { index: true, element: <Navigate to="/admin/dashboard" replace /> },
       {
@@ -370,6 +391,10 @@ export const router = createBrowserRouter([
             breadcrumbs={[{ label: 'Admin', to: '/admin/dashboard' }, { label: 'Settings' }]}
           />
         ),
+      },
+      {
+        path: 'profile',
+        element: <ProfilePage />,
       },
     ],
   },

@@ -9,8 +9,14 @@ import { generalLimiter } from './middleware/rateLimiter.js';
 import notFound from './middleware/notFound.js';
 import errorHandler from './middleware/errorHandler.js';
 import healthRoutes from './routes/health.routes.js';
+import authRoutes from './routes/auth.routes.js';
+import { protect, authorizeRoles } from './middleware/auth.middleware.js';
+import { sendSuccess } from './utils/response.js';
 
 const app = express();
+
+// Trust reverse proxy (for Render/Vercel and accurate IP rate limiting)
+app.set('trust proxy', 1);
 
 // Request identifier
 app.use(requestId);
@@ -55,6 +61,15 @@ if (env.NODE_ENV !== 'test') {
 
 // API Routes
 app.use('/api', healthRoutes);
+app.use('/api/auth', authRoutes);
+
+// Admin role check verification route
+app.get('/api/admin/ping', protect, authorizeRoles('admin'), (req, res) => {
+  return sendSuccess(res, {
+    data: { role: req.user.role },
+    message: 'Admin access verified',
+  });
+});
 
 // 404 Handler
 app.use(notFound);

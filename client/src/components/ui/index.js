@@ -3,6 +3,7 @@ export { IconButton } from './IconButton';
 export { Spinner } from './Spinner';
 export { FormField } from './FormField';
 export { Input } from './Input';
+export { PasswordInput } from './PasswordInput';
 export { Textarea } from './Textarea';
 export { Select } from './Select';
 export { Checkbox } from './Checkbox';

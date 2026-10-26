@@ -1,10 +1,16 @@
 import React, { useState } from 'react';
-import { Link, NavLink, Outlet } from 'react-router-dom';
-import { Menu, X, ArrowUpRight } from 'lucide-react';
+import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { Menu, X, ArrowUpRight, User, LogOut, LayoutDashboard, ChevronDown } from 'lucide-react';
 import { Wordmark, BRAND_NAME, TAGLINE, SUPPORT_EMAIL, WHATSAPP_NUMBER } from '../../config/brand';
+import { useAuth } from '../../context/AuthContext';
 import Button from '../ui/Button';
+import Avatar from '../ui/Avatar';
+import DropdownMenu from '../ui/DropdownMenu';
+import Badge from '../ui/Badge';
 
 export const PublicLayout = () => {
+  const { user, isAuthenticated, logout } = useAuth();
+  const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navLinks = [
@@ -12,6 +18,34 @@ export const PublicLayout = () => {
     { label: 'About', to: '/about' },
     { label: 'Admissions', to: '/admissions' },
     { label: 'Contact', to: '/contact' },
+  ];
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
+
+  const userMenuItems = [
+    {
+      id: 'dashboard',
+      label: user?.role === 'admin' ? 'Admin Workspace' : 'Student Portal',
+      icon: LayoutDashboard,
+      onClick: () => navigate(user?.role === 'admin' ? '/admin/dashboard' : '/student/dashboard'),
+    },
+    {
+      id: 'profile',
+      label: 'My Account',
+      icon: User,
+      onClick: () => navigate(user?.role === 'admin' ? '/admin/profile' : '/student/profile'),
+    },
+    { divider: true },
+    {
+      id: 'logout',
+      label: 'Sign Out',
+      icon: LogOut,
+      variant: 'danger',
+      onClick: handleLogout,
+    },
   ];
 
   return (
@@ -50,17 +84,39 @@ export const PublicLayout = () => {
 
           {/* Desktop Auth Actions */}
           <div className="hidden md:flex items-center space-x-4">
-            <Link
-              to="/login"
-              className="text-sm font-medium text-ink-muted hover:text-ink transition-colors px-2 py-1"
-            >
-              Sign In
-            </Link>
-            <Link to="/register">
-              <Button variant="primary" size="sm">
-                Apply Now
-              </Button>
-            </Link>
+            {isAuthenticated ? (
+              <div className="flex items-center gap-3">
+                <Link to={user?.role === 'admin' ? '/admin/dashboard' : '/student/dashboard'}>
+                  <Button variant="secondary" size="sm">
+                    {user?.role === 'admin' ? 'Admin Dashboard' : 'My Portal'}
+                  </Button>
+                </Link>
+                <DropdownMenu
+                  align="right"
+                  trigger={
+                    <button type="button" className="flex items-center gap-2 p-1 rounded-full hover:bg-surface-alt transition-colors">
+                      <Avatar name={user?.name} size="sm" />
+                      <ChevronDown className="w-3.5 h-3.5 text-ink-muted stroke-[1.5]" />
+                    </button>
+                  }
+                  items={userMenuItems}
+                />
+              </div>
+            ) : (
+              <>
+                <Link
+                  to="/login"
+                  className="text-sm font-medium text-ink-muted hover:text-ink transition-colors px-2 py-1"
+                >
+                  Sign In
+                </Link>
+                <Link to="/register">
+                  <Button variant="primary" size="sm">
+                    Apply Now
+                  </Button>
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Mobile menu button */}
@@ -90,20 +146,51 @@ export const PublicLayout = () => {
               </NavLink>
             ))}
             <div className="pt-2 flex flex-col gap-2">
-              <Link
-                to="/login"
-                onClick={() => setMobileMenuOpen(false)}
-                className="w-full text-center py-2 text-sm font-medium text-ink border border-line rounded"
-              >
-                Sign In
-              </Link>
-              <Link
-                to="/register"
-                onClick={() => setMobileMenuOpen(false)}
-                className="w-full text-center py-2 text-sm font-medium text-surface bg-primary rounded"
-              >
-                Apply Now
-              </Link>
+              {isAuthenticated ? (
+                <>
+                  <div className="flex items-center gap-2.5 p-2 bg-surface-alt rounded">
+                    <Avatar name={user?.name} size="sm" />
+                    <div className="flex flex-col min-w-0">
+                      <span className="text-xs font-semibold text-ink truncate">{user?.name}</span>
+                      <span className="text-[11px] text-ink-muted truncate font-mono">{user?.email}</span>
+                    </div>
+                  </div>
+                  <Link
+                    to={user?.role === 'admin' ? '/admin/dashboard' : '/student/dashboard'}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="w-full text-center py-2 text-sm font-medium text-surface bg-primary rounded"
+                  >
+                    Open Dashboard
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      handleLogout();
+                    }}
+                    className="w-full text-center py-2 text-sm font-medium text-danger border border-danger/30 rounded"
+                  >
+                    Sign Out
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link
+                    to="/login"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="w-full text-center py-2 text-sm font-medium text-ink border border-line rounded"
+                  >
+                    Sign In
+                  </Link>
+                  <Link
+                    to="/register"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="w-full text-center py-2 text-sm font-medium text-surface bg-primary rounded"
+                  >
+                    Apply Now
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         )}

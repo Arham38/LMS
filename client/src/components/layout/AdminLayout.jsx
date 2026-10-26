@@ -17,9 +17,10 @@ import {
   ChevronDown,
   Menu,
   X,
-  ShieldAlert,
+  User,
 } from 'lucide-react';
 import { Wordmark } from '../../config/brand';
+import { useAuth } from '../../context/AuthContext';
 import Avatar from '../ui/Avatar';
 import DropdownMenu from '../ui/DropdownMenu';
 import Badge from '../ui/Badge';
@@ -27,6 +28,7 @@ import Badge from '../ui/Badge';
 export const AdminLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { user, logout } = useAuth();
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   const navigationGroups = [
@@ -65,16 +67,17 @@ export const AdminLayout = () => {
   ];
 
   const handleLogout = () => {
-    try {
-      localStorage.removeItem('auth_token');
-      localStorage.removeItem('auth_user');
-    } catch {
-      // ignore
-    }
+    logout();
     navigate('/login');
   };
 
   const adminMenuItems = [
+    {
+      id: 'profile',
+      label: 'Admin Profile',
+      icon: User,
+      onClick: () => navigate('/admin/profile'),
+    },
     {
       id: 'settings',
       label: 'Admin Settings',
@@ -148,10 +151,10 @@ export const AdminLayout = () => {
       <div className="p-3 border-t border-line bg-surface-alt/30">
         <div className="flex items-center justify-between p-2 rounded hover:bg-surface-alt transition-colors">
           <div className="flex items-center gap-2.5 min-w-0">
-            <Avatar name="Instructor Admin" size="sm" />
+            <Avatar name={user?.name || 'Admin'} size="sm" />
             <div className="flex flex-col min-w-0">
-              <span className="text-xs font-semibold text-ink truncate">Instructor Admin</span>
-              <span className="text-[11px] text-ink-muted truncate font-mono">admin@codecraft.academy</span>
+              <span className="text-xs font-semibold text-ink truncate">{user?.name || 'Administrator'}</span>
+              <span className="text-[11px] text-ink-muted truncate font-mono">{user?.email}</span>
             </div>
           </div>
           <button
@@ -213,9 +216,13 @@ export const AdminLayout = () => {
             <DropdownMenu
               align="right"
               trigger={
-                <button type="button" className="flex items-center gap-2 rounded-full focus:outline-none">
-                  <Avatar name="Admin" size="sm" />
-                  <ChevronDown className="w-3.5 h-3.5 text-ink-muted hidden sm:inline stroke-[1.5]" />
+                <button type="button" className="flex items-center gap-2 rounded-full focus:outline-none p-1 hover:bg-surface-alt transition-colors">
+                  <Avatar name={user?.name || 'Admin'} size="sm" />
+                  <span className="text-xs font-medium text-ink hidden sm:inline max-w-[120px] truncate">
+                    {user?.name}
+                  </span>
+                  <Badge variant="primary" className="hidden md:inline-flex">Admin</Badge>
+                  <ChevronDown className="w-3.5 h-3.5 text-ink-muted stroke-[1.5]" />
                 </button>
               }
               items={adminMenuItems}
