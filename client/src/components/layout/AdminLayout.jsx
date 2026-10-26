@@ -19,6 +19,8 @@ import {
   Menu,
   X,
   User,
+  Megaphone,
+  Award,
 } from 'lucide-react';
 import { Wordmark } from '../../config/brand';
 import { useAuth } from '../../context/AuthContext';
@@ -26,6 +28,7 @@ import enrollmentService from '../../services/enrollment.service';
 import Avatar from '../ui/Avatar';
 import DropdownMenu from '../ui/DropdownMenu';
 import Badge from '../ui/Badge';
+import NotificationBell from '../notifications/NotificationBell';
 
 export const AdminLayout = () => {
   const navigate = useNavigate();
@@ -64,6 +67,8 @@ export const AdminLayout = () => {
         { label: 'Live Sessions', to: '/admin/sessions', icon: Video },
         { label: 'Quizzes & Tasks', to: '/admin/tasks', icon: FileCheck2 },
         { label: 'Assignments', to: '/admin/assignments', icon: ClipboardList },
+        { label: 'Gradebook', to: '/admin/gradebook', icon: Award },
+        { label: 'Announcements', to: '/admin/announcements', icon: Megaphone },
         { label: 'Notes & Materials', to: '/admin/materials', icon: FileText },
       ],
     },
@@ -234,6 +239,7 @@ export const AdminLayout = () => {
           </div>
 
           <div className="flex items-center gap-4">
+            <NotificationBell />
             <span className="text-xs text-ink-muted font-mono hidden sm:inline">
               Asia/Karachi (PKT)
             </span>

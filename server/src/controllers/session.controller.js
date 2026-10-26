@@ -5,6 +5,7 @@ import Enrollment from '../models/enrollment.model.js';
 import ApiError from '../utils/ApiError.js';
 import asyncHandler from '../utils/asyncHandler.js';
 import { sendSuccess } from '../utils/response.js';
+import notificationService from '../services/notification.service.js';
 
 // ==========================================
 // ADMIN CONTROLLERS
@@ -94,6 +95,16 @@ export const createSessionAdmin = asyncHandler(async (req, res) => {
     course: courseId,
   });
 
+  if (session.isPublished) {
+    notificationService.notifySessionEvent({
+      courseId,
+      courseTitle: course.title,
+      sessionTitle: session.title,
+      eventType: 'scheduled',
+      scheduledAt: session.scheduledAt,
+    }).catch((err) => console.error('[Notification] Error creating session notice:', err.message));
+  }
+
   return sendSuccess(res, {
     statusCode: 201,
     data: session,
@@ -182,6 +193,15 @@ export const updateSessionStatusAdmin = asyncHandler(async (req, res) => {
 
   session.status = status;
   await session.save();
+
+  if (status === 'cancelled') {
+    notificationService.notifySessionEvent({
+      courseId: session.course,
+      courseTitle: '',
+      sessionTitle: session.title,
+      eventType: 'cancelled',
+    }).catch((err) => console.error('[Notification] Error creating session cancel notice:', err.message));
+  }
 
   return sendSuccess(res, {
     data: session,

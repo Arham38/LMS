@@ -4,6 +4,7 @@ import User from '../models/user.model.js';
 import ApiError from '../utils/ApiError.js';
 import asyncHandler from '../utils/asyncHandler.js';
 import { sendSuccess, formatPagination } from '../utils/response.js';
+import notificationService from '../services/notification.service.js';
 
 // Student: POST /api/enrollments
 export const createEnrollment = asyncHandler(async (req, res) => {
@@ -287,6 +288,14 @@ export const reviewEnrollment = asyncHandler(async (req, res) => {
   }
 
   await enrollment.save();
+
+  // Send Notification to student (async fire-and-forget)
+  notificationService.notifyEnrollmentReviewed({
+    studentId: enrollment.student._id,
+    courseTitle: enrollment.course.title,
+    status: enrollment.status,
+    adminNote: enrollment.adminNote,
+  }).catch((err) => console.error('[Notification] Error sending enrollment review notice:', err.message));
 
   return sendSuccess(res, {
     data: enrollment,

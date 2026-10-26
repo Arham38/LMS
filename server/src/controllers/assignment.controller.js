@@ -5,6 +5,7 @@ import Enrollment from '../models/enrollment.model.js';
 import ApiError from '../utils/ApiError.js';
 import asyncHandler from '../utils/asyncHandler.js';
 import { sendSuccess } from '../utils/response.js';
+import notificationService from '../services/notification.service.js';
 
 // ==========================================
 // ADMIN ASSIGNMENT CONTROLLERS
@@ -103,6 +104,15 @@ export const createAssignmentAdmin = asyncHandler(async (req, res) => {
     ...req.body,
     course: courseId,
   });
+
+  if (assignment.isPublished) {
+    notificationService.notifyContentPublished({
+      courseId,
+      courseTitle: course.title,
+      contentType: 'assignment',
+      itemTitle: assignment.title,
+    }).catch((err) => console.error('[Notification] Error creating assignment publish notice:', err.message));
+  }
 
   return sendSuccess(res, {
     statusCode: 201,
@@ -411,6 +421,17 @@ export const gradeSubmissionAdmin = asyncHandler(async (req, res) => {
   submission.gradedBy = req.user._id;
 
   await submission.save();
+
+  // Trigger Notification to student
+  notificationService.notifyAssignmentGraded({
+    studentId: submission.student,
+    courseId: submission.course,
+    assignmentTitle: assignment.title,
+    action,
+    marks: submission.finalMarks !== null ? submission.finalMarks : submission.marks,
+    maxMarks: assignment.maxMarks,
+    feedback: submission.feedback,
+  }).catch((err) => console.error('[Notification] Error creating assignment graded notice:', err.message));
 
   return sendSuccess(res, {
     data: submission,

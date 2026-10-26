@@ -6,6 +6,7 @@ import parseQuizPlainText from '../utils/quizParser.js';
 import ApiError from '../utils/ApiError.js';
 import asyncHandler from '../utils/asyncHandler.js';
 import { sendSuccess } from '../utils/response.js';
+import notificationService from '../services/notification.service.js';
 
 // ==========================================
 // ADMIN QUIZ CONTROLLERS
@@ -92,6 +93,15 @@ export const createQuizAdmin = asyncHandler(async (req, res) => {
     ...req.body,
     course: courseId,
   });
+
+  if (quiz.isPublished) {
+    notificationService.notifyContentPublished({
+      courseId,
+      courseTitle: course.title,
+      contentType: 'quiz',
+      itemTitle: quiz.title,
+    }).catch((err) => console.error('[Notification] Error creating quiz publish notice:', err.message));
+  }
 
   return sendSuccess(res, {
     statusCode: 201,

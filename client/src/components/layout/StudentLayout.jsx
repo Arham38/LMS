@@ -11,12 +11,14 @@ import {
   LogOut,
   ChevronDown,
   User,
+  Award,
 } from 'lucide-react';
 import { Wordmark } from '../../config/brand';
 import { useAuth } from '../../context/AuthContext';
 import Avatar from '../ui/Avatar';
 import DropdownMenu from '../ui/DropdownMenu';
 import Badge from '../ui/Badge';
+import NotificationBell from '../notifications/NotificationBell';
 
 export const StudentLayout = () => {
   const navigate = useNavigate();
@@ -37,6 +39,7 @@ export const StudentLayout = () => {
     { label: 'Live Schedule', to: '/student/schedule', icon: Calendar },
     { label: 'Assignments', to: '/student/assignments', icon: FileCheck2 },
     { label: 'Quizzes', to: '/student/quizzes', icon: HelpCircle },
+    { label: 'Gradebook', to: '/student/grades', icon: Award },
     { label: 'Notes & Files', to: '/student/notes', icon: FileText },
     { label: 'Fee & Payments', to: '/student/payments', icon: CreditCard },
   ];
@@ -169,6 +172,7 @@ export const StudentLayout = () => {
 
           {/* Right: Notification & Profile */}
           <div className="flex items-center gap-3">
+            <NotificationBell />
             <DropdownMenu
               align="right"
               trigger={

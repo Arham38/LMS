@@ -25,6 +25,14 @@ import AdminQuizzesPage from '../pages/admin/AdminQuizzesPage';
 import AdminQuizBuilderPage from '../pages/admin/AdminQuizBuilderPage';
 import AdminAssignmentsPage from '../pages/admin/AdminAssignmentsPage';
 import AdminGradingSplitPage from '../pages/admin/AdminGradingSplitPage';
+import AdminDashboardPage from '../pages/admin/AdminDashboardPage';
+import AdminStudentsPage from '../pages/admin/AdminStudentsPage';
+import AdminStudentDetailPage from '../pages/admin/AdminStudentDetailPage';
+import AdminAnnouncementsPage from '../pages/admin/AdminAnnouncementsPage';
+import AdminGradebookPage from '../pages/admin/AdminGradebookPage';
+import StudentDashboardPage from '../pages/student/StudentDashboardPage';
+import StudentGradesPage from '../pages/student/StudentGradesPage';
+import NotificationsPage from '../pages/NotificationsPage';
 import StudentCourseSpacePage from '../pages/student/StudentCourseSpacePage';
 import StudentScheduleRouter from '../pages/student/StudentScheduleRouter';
 import StudentQuizPage from '../pages/student/StudentQuizPage';
@@ -176,15 +184,7 @@ export const router = createBrowserRouter([
       { index: true, element: <Navigate to="/student/dashboard" replace /> },
       {
         path: 'dashboard',
-        element: (
-          <PhasePlaceholder
-            title="Student Overview"
-            subtitle="Upcoming live lectures, attendance stats, and latest announcements."
-            phaseNumber="2"
-            phaseName="Student Dashboard"
-            breadcrumbs={[{ label: 'Portal', to: '/student/dashboard' }, { label: 'Overview' }]}
-          />
-        ),
+        element: <StudentDashboardPage />,
       },
       {
         path: 'courses',
@@ -197,6 +197,18 @@ export const router = createBrowserRouter([
       {
         path: 'schedule',
         element: <StudentScheduleRouter />,
+      },
+      {
+        path: 'grades',
+        element: <StudentGradesPage />,
+      },
+      {
+        path: 'courses/:courseId/grades',
+        element: <StudentGradesPage />,
+      },
+      {
+        path: 'notifications',
+        element: <NotificationsPage />,
       },
       {
         path: 'assignments',
@@ -259,15 +271,7 @@ export const router = createBrowserRouter([
       { index: true, element: <Navigate to="/admin/dashboard" replace /> },
       {
         path: 'dashboard',
-        element: (
-          <PhasePlaceholder
-            title="Admin Command Center"
-            subtitle="Real-time cohort stats, revenue indicators, and quick moderation actions."
-            phaseNumber="4"
-            phaseName="Admin Overview & Reporting"
-            breadcrumbs={[{ label: 'Admin', to: '/admin/dashboard' }, { label: 'Overview' }]}
-          />
-        ),
+        element: <AdminDashboardPage />,
       },
       {
         path: 'analytics',
@@ -343,15 +347,31 @@ export const router = createBrowserRouter([
       },
       {
         path: 'students',
-        element: (
-          <PhasePlaceholder
-            title="Student Roster"
-            subtitle="View all registered and enrolled students, activity logs, and status."
-            phaseNumber="2"
-            phaseName="Student Management"
-            breadcrumbs={[{ label: 'Admin', to: '/admin/dashboard' }, { label: 'Students' }]}
-          />
-        ),
+        element: <AdminStudentsPage />,
+      },
+      {
+        path: 'students/:id',
+        element: <AdminStudentDetailPage />,
+      },
+      {
+        path: 'announcements',
+        element: <AdminAnnouncementsPage />,
+      },
+      {
+        path: 'courses/:id/announcements',
+        element: <AdminAnnouncementsPage />,
+      },
+      {
+        path: 'gradebook',
+        element: <AdminGradebookPage />,
+      },
+      {
+        path: 'courses/:id/gradebook',
+        element: <AdminGradebookPage />,
+      },
+      {
+        path: 'notifications',
+        element: <NotificationsPage />,
       },
       {
         path: 'enrollments',

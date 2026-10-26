@@ -63,6 +63,10 @@ const userSchema = new mongoose.Schema(
       type: Date,
       select: false,
     },
+    privateNotes: {
+      type: String,
+      default: '',
+    },
   },
   {
     timestamps: true,

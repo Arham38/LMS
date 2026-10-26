@@ -46,6 +46,23 @@ import {
   gradeSubmissionAdmin,
   exportAssignmentMarksCSVAdmin,
 } from '../controllers/assignment.controller.js';
+import {
+  getAdminAnnouncementsByCourse,
+  createAnnouncementAdmin,
+  updateAnnouncementAdmin,
+  deleteAnnouncementAdmin,
+} from '../controllers/announcement.controller.js';
+import { getAdminStats } from '../controllers/adminStats.controller.js';
+import {
+  getAdminStudents,
+  getAdminStudentById,
+  updateStudentStatusAdmin,
+  updateStudentNotesAdmin,
+} from '../controllers/adminStudent.controller.js';
+import {
+  getCourseGradebookAdmin,
+  exportCourseGradebookCSVAdmin,
+} from '../controllers/gradebook.controller.js';
 import { protect, authorizeRoles } from '../middleware/auth.middleware.js';
 import { validateBody } from '../middleware/validate.js';
 import { createCourseSchema, updateCourseSchema } from '../validators/course.validator.js';
@@ -67,6 +84,12 @@ import {
   updateAssignmentSchema,
   gradeSubmissionSchema,
 } from '../validators/assignment.validator.js';
+import {
+  createAnnouncementSchema,
+  updateAnnouncementSchema,
+  updateStudentStatusSchema,
+  updateStudentNotesSchema,
+} from '../validators/announcement.validator.js';
 import { sendSuccess } from '../utils/response.js';
 
 const router = Router();
@@ -126,6 +149,41 @@ router.delete('/assignments/:id', deleteAssignmentAdmin);
 router.get('/assignments/:id/submissions', getAssignmentSubmissionsAdmin);
 router.patch('/submissions/:id/grade', validateBody(gradeSubmissionSchema), gradeSubmissionAdmin);
 router.get('/assignments/:id/export', exportAssignmentMarksCSVAdmin);
+
+// Admin Telemetry & Aggregated Stats
+router.get('/stats', getAdminStats);
+
+// Course Announcements Management
+router.get('/courses/:courseId/announcements', getAdminAnnouncementsByCourse);
+router.post(
+  '/courses/:courseId/announcements',
+  validateBody(createAnnouncementSchema),
+  createAnnouncementAdmin
+);
+router.put(
+  '/announcements/:id',
+  validateBody(updateAnnouncementSchema),
+  updateAnnouncementAdmin
+);
+router.delete('/announcements/:id', deleteAnnouncementAdmin);
+
+// Student Management & Private Notes
+router.get('/students', getAdminStudents);
+router.get('/students/:id', getAdminStudentById);
+router.patch(
+  '/students/:id/status',
+  validateBody(updateStudentStatusSchema),
+  updateStudentStatusAdmin
+);
+router.put(
+  '/students/:id/notes',
+  validateBody(updateStudentNotesSchema),
+  updateStudentNotesAdmin
+);
+
+// Cohort Gradebook & CSV Export
+router.get('/courses/:courseId/gradebook', getCourseGradebookAdmin);
+router.get('/courses/:courseId/gradebook/export', exportCourseGradebookCSVAdmin);
 
 // Enrollment Management
 router.get('/enrollments', getAdminEnrollments);

@@ -109,6 +109,26 @@ const courseSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    gradeWeights: {
+      attendance: {
+        type: Number,
+        default: 20,
+        min: 0,
+        max: 100,
+      },
+      quizzes: {
+        type: Number,
+        default: 40,
+        min: 0,
+        max: 100,
+      },
+      assignments: {
+        type: Number,
+        default: 40,
+        min: 0,
+        max: 100,
+      },
+    },
   },
   {
     timestamps: true,
