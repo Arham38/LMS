@@ -23,9 +23,9 @@ export const storageService = {
   },
 
   /**
-   * Directly upload file to Cloudflare R2 bucket via presigned PUT URL with XMLHttpRequest progress
+   * Directly upload file to Supabase Storage bucket via presigned PUT URL with XMLHttpRequest progress
    */
-  uploadDirectToR2(uploadUrl, file, onProgress) {
+  uploadDirectToStorage(uploadUrl, file, onProgress) {
     return new Promise((resolve, reject) => {
       const xhr = new XMLHttpRequest();
 
@@ -58,6 +58,11 @@ export const storageService = {
       xhr.setRequestHeader('Content-Type', file.type);
       xhr.send(file);
     });
+  },
+
+  // Compatibility alias
+  uploadDirectToR2(...args) {
+    return this.uploadDirectToStorage(...args);
   },
 };
 

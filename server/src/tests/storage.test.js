@@ -25,7 +25,7 @@ beforeEach(async () => {
   await User.deleteMany({});
 });
 
-describe('Phase 2.5: Cloudflare R2 Storage and Access Control', () => {
+describe('Phase 2.5: Supabase Storage and Access Control', () => {
   let studentUser;
   let studentToken;
   let otherStudentUser;

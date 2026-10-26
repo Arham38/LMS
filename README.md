@@ -42,7 +42,7 @@ All instruction happens live over interactive video conferencing (Google Meet or
 ├── docs/                        # Architecture & Engineering Specifications
 │   ├── DESIGN_SYSTEM.md         # Visual rules, tokens, typography, and anti-patterns
 │   ├── PROJECT_CONTEXT.md       # Master project specification & non-negotiables
-│   └── STORAGE_R2_SETUP.md      # Cloudflare R2 bucket setup guide
+│   └── STORAGE_SETUP.md         # Supabase Storage bucket setup guide
 │
 ├── .eslintrc.json               # Code linting configuration
 ├── .prettierrc                  # Code formatting standards
@@ -56,7 +56,7 @@ All instruction happens live over interactive video conferencing (Google Meet or
 - **No Passwords or Tokens Leaked**: Password hashes use `bcryptjs` (cost 12) with `select: false` on Mongoose models. Single-use password reset tokens are hashed with SHA-256 and expire in 30 minutes. Internal instructor notes (`privateNotes`) are strictly stripped from student responses.
 - **Strict Join Window Rule**: Live lecture meeting links are never included in list responses. They are issued only via `POST /api/sessions/:id/join` to approved students inside the join window: **15 minutes before scheduled start until 30 minutes after completion**.
 - **Quiz Integrity**: Questions returned during an active attempt strictly omit `correctIndexes` and `explanation`. Full answers are revealed only according to the quiz policy (`immediately`, `after_close`, or `never`).
-- **Private Cloud Storage**: Files never pass through the Node.js server. The server verifies caller authorization and generates short-lived presigned Cloudflare R2 URLs (upload PUT valid for 15 minutes, download GET valid for 1 hour).
+- **Private Cloud Storage**: Files never pass through the Node.js server. The server verifies caller authorization and generates short-lived presigned Supabase Storage URLs (upload PUT valid for 15 minutes, download GET valid for 1 hour).
 - **Immutability of Privileges**: Students cannot set their own role, course fee, amount due, enrollment status, submission status, or assignment marks. All authorization checks occur on the server.
 - **Rate Limiting**: Multi-tiered rate limiters via `express-rate-limit`:
   - Authentication endpoints: 10 requests per 15 minutes per IP.
@@ -81,11 +81,10 @@ Create `server/.env` based on `server/.env.example`:
 | `ADMIN_NAME` | Initial administrator name for seeder | `Lead Instructor` |
 | `ADMIN_EMAIL`| Initial administrator login email | `admin@codecraft.pk` |
 | `ADMIN_PASSWORD` | Initial administrator login password | `AdminSecret123!` |
-| `R2_ACCOUNT_ID` | Cloudflare account ID | Cloudflare dashboard |
-| `R2_ACCESS_KEY_ID` | Cloudflare R2 API token access key | R2 token |
-| `R2_SECRET_ACCESS_KEY` | Cloudflare R2 API token secret key | R2 secret |
-| `R2_BUCKET` | Cloudflare R2 private bucket name | `codecraft-files` |
-| `R2_ENDPOINT` | Cloudflare R2 S3-compatible API endpoint | `https://<account_id>.r2.cloudflarestorage.com` |
+| `SUPABASE_URL` | Supabase project API URL | `https://rhphhmpardsfkrtrpqfk.supabase.co` |
+| `SUPABASE_ANON_KEY` | Supabase publishable anonymous key | Supabase API settings |
+| `SUPABASE_SERVICE_ROLE_KEY` | Supabase service role secret key | Supabase API settings |
+| `SUPABASE_BUCKET` | Supabase private storage bucket name | `uploads` |
 
 ### Client (`client/.env`)
 Create `client/.env`:
@@ -138,7 +137,7 @@ Suites cover:
 - Health & rate limiting (`health.test.js`)
 - Authentication, tokens & password reset (`auth.test.js`)
 - Enrollment & manual payment verification (`enrollment.test.js`)
-- Cloudflare R2 presigned URLs & file access controls (`storage.test.js`)
+- Supabase Storage presigned URLs & file access controls (`storage.test.js`)
 - Live sessions, join windows & attendance marking (`session.test.js`)
 - Auto-graded quizzes, attempts & answer hiding (`quiz.test.js`)
 - Assignments, rubric grading & late penalties (`assignment.test.js`)

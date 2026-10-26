@@ -712,7 +712,7 @@ export const AdminSessionsPage = () => {
                 kind="pdf"
                 accept="application/pdf"
                 label="Select Lecture PDF"
-                helperText="PDF up to 20MB. Uploads directly to private Cloudflare R2 bucket."
+                helperText="PDF up to 20MB. Uploads directly to private Supabase Storage bucket."
                 value={newResourceKey}
                 onChange={setNewResourceKey}
               />

@@ -162,7 +162,7 @@ export const siteContent = {
         topics: [
           'Context API patterns and scalable client-state stores (Zustand)',
           'Optimistic updates, cache invalidation and loading skeleton states',
-          'Cloud storage pipelines: presigned URLs with Cloudflare R2 and AWS S3',
+          'Cloud storage pipelines: presigned URLs with Supabase Storage and AWS S3',
           'Real-time communication concepts, polling fallbacks and notifications',
           'Robust modal dialogs, drawers, and mobile touch interactions',
         ],
@@ -199,7 +199,7 @@ export const siteContent = {
         summary: 'Packaging, containerization, hosting infrastructure, and portfolio capstone defense.',
         topics: [
           'Environment management, production build pipelines and minification',
-          'Deployment on Render, Vercel, Supabase, and Cloudflare R2',
+          'Deployment on Render, Vercel, and Supabase',
           'Reverse proxies, SSL termination, and custom domain setup',
           'Capstone project presentation: live code walkthrough and architectural defense',
           'Course certificate issuance and next-steps guidance',
@@ -215,8 +215,8 @@ export const siteContent = {
     items: [
       {
         title: 'Distributed LMS & Assessment Platform',
-        description: 'Cohort management, timed auto-graded quizzes, line-by-line assignment rubric reviews, and Cloudflare R2 storage.',
-        tech: ['React', 'Node.js', 'MongoDB', 'Cloudflare R2', 'Tailwind CSS'],
+        description: 'Cohort management, timed auto-graded quizzes, line-by-line assignment rubric reviews, and Supabase Storage.',
+        tech: ['React', 'Node.js', 'MongoDB', 'Supabase Storage', 'Tailwind CSS'],
       },
       {
         title: 'Real-Time Inventory & Invoicing System',

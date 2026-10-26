@@ -77,8 +77,8 @@ export const FileUploader = ({
         filename: file.name,
       });
 
-      // Step B: Direct upload to R2 bucket via XHR with progress
-      await storageService.uploadDirectToR2(uploadUrl, file, (percent) => {
+      // Step B: Direct upload to Supabase Storage bucket via XHR with progress
+      await storageService.uploadDirectToStorage(uploadUrl, file, (percent) => {
         setProgress(percent);
       });
 
