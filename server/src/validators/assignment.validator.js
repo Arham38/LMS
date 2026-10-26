@@ -11,6 +11,7 @@ export const createAssignmentSchema = z.object({
   title: z.string().trim().min(2, 'Title must be at least 2 characters').max(140, 'Title cannot exceed 140 characters'),
   description: z.string().trim().min(2, 'Description is required'),
   attachmentKey: z.string().trim().nullable().optional(),
+  attachmentName: z.string().trim().nullable().optional(),
   dueAt: z
     .string()
     .trim()
@@ -29,6 +30,7 @@ export const updateAssignmentSchema = createAssignmentSchema.partial();
 
 export const submitSolutionSchema = z.object({
   fileKey: z.string().trim().nullable().optional(),
+  fileName: z.string().trim().nullable().optional(),
   link: z
     .string()
     .trim()

@@ -58,6 +58,7 @@ export const EnrollmentWizardPage = () => {
   const [createdEnrollment, setCreatedEnrollment] = useState(null);
   const [serverError, setServerError] = useState('');
   const [proofKey, setProofKey] = useState('');
+  const [proofName, setProofName] = useState('');
 
   const {
     register,
@@ -129,6 +130,7 @@ export const EnrollmentWizardPage = () => {
         senderNumber: values.senderNumber,
         paymentNote: values.paymentNote,
         paymentProofKey: proofKey || undefined,
+        paymentProofName: proofName || undefined,
       });
 
       setCreatedEnrollment(response);
@@ -407,11 +409,16 @@ export const EnrollmentWizardPage = () => {
 
               <FileUploader
                 kind="image"
+                courseId={course?._id}
                 accept="image/png,image/jpeg"
                 label="Payment Receipt Screenshot (Optional)"
                 helperText="Upload a screenshot or photo of your transfer receipt (PNG or JPG up to 5MB)"
                 value={proofKey}
-                onChange={setProofKey}
+                fileName={proofName}
+                onChange={(key, name) => {
+                  setProofKey(key);
+                  setProofName(name);
+                }}
               />
 
               <FormField

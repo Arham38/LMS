@@ -13,6 +13,11 @@ const resourceSchema = new mongoose.Schema(
       required: [true, 'Resource fileKey is required'],
       trim: true,
     },
+    fileName: {
+      type: String,
+      trim: true,
+      default: null,
+    },
   },
   { _id: true }
 );

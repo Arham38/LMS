@@ -23,6 +23,7 @@ export const createSessionSchema = z.object({
       z.object({
         title: z.string().trim().min(1, 'Resource title is required').max(100),
         fileKey: z.string().trim().min(1, 'Resource fileKey is required'),
+        fileName: z.string().trim().optional(),
       })
     )
     .optional()

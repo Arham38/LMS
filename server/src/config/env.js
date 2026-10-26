@@ -2,6 +2,9 @@ import dotenv from 'dotenv';
 import { z } from 'zod';
 
 dotenv.config();
+if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+  dotenv.config({ path: 'server/.env' });
+}
 
 const envSchema = z.object({
   PORT: z.coerce.number().default(5000),

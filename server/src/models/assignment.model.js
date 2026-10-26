@@ -52,6 +52,11 @@ const assignmentSchema = new mongoose.Schema(
       trim: true,
       default: null,
     },
+    attachmentName: {
+      type: String,
+      trim: true,
+      default: null,
+    },
     dueAt: {
       type: Date,
       required: [true, 'Due date is required'],

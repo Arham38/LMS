@@ -72,6 +72,7 @@ export const AdminSessionsPage = () => {
   const [resources, setResources] = useState([]);
   const [newResourceTitle, setNewResourceTitle] = useState('');
   const [newResourceKey, setNewResourceKey] = useState('');
+  const [newResourceName, setNewResourceName] = useState('');
 
   // Delete State
   const [sessionToDelete, setSessionToDelete] = useState(null);
@@ -157,6 +158,7 @@ export const AdminSessionsPage = () => {
     setResources([]);
     setNewResourceTitle('');
     setNewResourceKey('');
+    setNewResourceName('');
     setEditorOpen(true);
   };
 
@@ -184,6 +186,7 @@ export const AdminSessionsPage = () => {
     setResources(session.resources || []);
     setNewResourceTitle('');
     setNewResourceKey('');
+    setNewResourceName('');
     setEditorOpen(true);
   };
 
@@ -194,9 +197,17 @@ export const AdminSessionsPage = () => {
       return;
     }
     const title = newResourceTitle.trim() || 'Lecture Notes';
-    setResources((prev) => [...prev, { title, fileKey: newResourceKey }]);
+    setResources((prev) => [
+      ...prev,
+      {
+        title,
+        fileKey: newResourceKey,
+        fileName: newResourceName || storageService.getDisplayFilename(newResourceKey),
+      },
+    ]);
     setNewResourceTitle('');
     setNewResourceKey('');
+    setNewResourceName('');
     toast.success('Note attachment added.');
   };
 
@@ -684,7 +695,7 @@ export const AdminSessionsPage = () => {
                     <div className="flex items-center gap-2">
                       <FileText className="w-4 h-4 text-primary" />
                       <span className="font-medium text-ink">{res.title}</span>
-                      <span className="text-[10px] font-mono text-ink-muted">({res.fileKey.split('/').pop()})</span>
+                      <span className="text-[10px] font-mono text-ink-muted">({res.fileName || storageService.getDisplayFilename(res.fileKey)})</span>
                     </div>
                     <button
                       type="button"
@@ -710,11 +721,16 @@ export const AdminSessionsPage = () => {
 
               <FileUploader
                 kind="pdf"
+                courseId={selectedCourseId}
                 accept="application/pdf"
                 label="Select Lecture PDF"
                 helperText="PDF up to 20MB. Uploads directly to private Supabase Storage bucket."
                 value={newResourceKey}
-                onChange={setNewResourceKey}
+                fileName={newResourceName}
+                onChange={(key, fileName) => {
+                  setNewResourceKey(key);
+                  setNewResourceName(fileName);
+                }}
               />
 
               <Button

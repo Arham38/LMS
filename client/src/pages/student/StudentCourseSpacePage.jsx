@@ -73,6 +73,7 @@ export const StudentCourseSpacePage = () => {
   const [submittingAssignment, setSubmittingAssignment] = useState(null);
   const [submissionForm, setSubmissionForm] = useState({
     fileKey: '',
+    fileName: '',
     link: '',
     comment: '',
   });
@@ -262,6 +263,7 @@ export const StudentCourseSpacePage = () => {
     const existing = assignment.mySubmission;
     setSubmissionForm({
       fileKey: existing?.fileKey || '',
+      fileName: existing?.fileName || '',
       link: existing?.link || '',
       comment: '',
     });
@@ -290,6 +292,7 @@ export const StudentCourseSpacePage = () => {
     try {
       await assignmentService.submitSolution(submittingAssignment._id, {
         fileKey: submissionForm.fileKey || null,
+        fileName: submissionForm.fileName || null,
         link: submissionForm.link || null,
         comment: submissionForm.comment.trim(),
       });
@@ -1183,15 +1186,26 @@ export const StudentCourseSpacePage = () => {
                             </a>
                           )}
                           {mySub.fileKey && (
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleDownloadSubmissionFile(mySub.fileKey)}
-                              loading={downloadingSubmissionKey === mySub.fileKey}
-                              icon={Download}
-                            >
-                              Download Archive
-                            </Button>
+                            <div className="flex items-center gap-2">
+                              <span
+                                className="text-xs font-mono text-ink bg-surface px-2.5 py-1.5 rounded border border-line flex items-center gap-1.5 max-w-[240px] truncate"
+                                title={mySub.fileName || storageService.getDisplayFilename(mySub.fileKey)}
+                              >
+                                <FileText className="w-3.5 h-3.5 text-primary shrink-0" />
+                                <span className="truncate">
+                                  {mySub.fileName || storageService.getDisplayFilename(mySub.fileKey)}
+                                </span>
+                              </span>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleDownloadSubmissionFile(mySub.fileKey)}
+                                loading={downloadingSubmissionKey === mySub.fileKey}
+                                icon={Download}
+                              >
+                                Download
+                              </Button>
+                            </div>
                           )}
                         </div>
                       </div>
@@ -1231,10 +1245,12 @@ export const StudentCourseSpacePage = () => {
                   </label>
                   <FileUploader
                     kind="zip"
+                    courseId={courseId}
                     accept=".zip,.pdf,application/zip,application/x-zip-compressed,application/pdf"
                     maxSize={50 * 1024 * 1024}
                     value={submissionForm.fileKey}
-                    onChange={(key) => setSubmissionForm({ ...submissionForm, fileKey: key })}
+                    fileName={submissionForm.fileName}
+                    onChange={(key, fileName) => setSubmissionForm({ ...submissionForm, fileKey: key, fileName })}
                   />
                 </div>
               )}

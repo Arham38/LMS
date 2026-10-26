@@ -142,7 +142,7 @@ describe('Phase 2.5: Supabase Storage and Access Control', () => {
       expect(res.body.data.key).toMatch(/^uploads\/pdf\//);
     });
 
-    it('allows students to obtain upload URLs for kind=image (payment proof)', async () => {
+    it('allows students to obtain upload URLs for kind=image preserving original filename', async () => {
       const res = await request(app)
         .post('/api/uploads/presign')
         .set('Authorization', `Bearer ${studentToken}`)
@@ -151,14 +151,14 @@ describe('Phase 2.5: Supabase Storage and Access Control', () => {
           contentType: 'image/png',
           size: 1024 * 300, // 300kb
           filename: 'jazzcash_receipt.png',
+          courseId: sampleCourse._id.toString(),
         });
 
       expect(res.status).toBe(200);
       expect(res.body.success).toBe(true);
       expect(res.body.data.uploadUrl).toBeDefined();
-      expect(res.body.data.key).toMatch(/^uploads\/image\//);
-      // Key must NOT use user's raw filename
-      expect(res.body.data.key).not.toContain('jazzcash_receipt.png');
+      expect(res.body.data.key).toMatch(new RegExp(`^uploads/image/${sampleCourse._id}/${studentUser._id}/\\d+-jazzcash_receipt\\.png$`));
+      expect(res.body.data.filename).toBe('jazzcash_receipt.png');
     });
   });
 

@@ -25,6 +25,11 @@ const submissionHistorySchema = new mongoose.Schema(
       type: String,
       default: null,
     },
+    fileName: {
+      type: String,
+      trim: true,
+      default: null,
+    },
     link: {
       type: String,
       default: null,
@@ -79,6 +84,11 @@ const submissionSchema = new mongoose.Schema(
     },
     fileKey: {
       type: String,
+      default: null,
+    },
+    fileName: {
+      type: String,
+      trim: true,
       default: null,
     },
     link: {

@@ -5,6 +5,7 @@ import ApiError from '../utils/ApiError.js';
 import asyncHandler from '../utils/asyncHandler.js';
 import { sendSuccess, formatPagination } from '../utils/response.js';
 import notificationService from '../services/notification.service.js';
+import { getOriginalFilenameFromKey } from '../services/storage.service.js';
 
 // Student: POST /api/enrollments
 export const createEnrollment = asyncHandler(async (req, res) => {
@@ -16,7 +17,10 @@ export const createEnrollment = asyncHandler(async (req, res) => {
     senderNumber,
     paymentNote,
     paymentProofKey,
+    paymentProofName,
   } = req.body;
+
+  const resolvedProofName = paymentProofName || (paymentProofKey ? getOriginalFilenameFromKey(paymentProofKey) : null);
 
   // 1. Verify course exists and is published
   const course = await Course.findById(courseId);
@@ -77,7 +81,10 @@ export const createEnrollment = asyncHandler(async (req, res) => {
     previousEnrollment.senderName = senderName;
     previousEnrollment.senderNumber = senderNumber;
     previousEnrollment.paymentNote = paymentNote || '';
-    if (paymentProofKey) previousEnrollment.paymentProofKey = paymentProofKey;
+    if (paymentProofKey) {
+      previousEnrollment.paymentProofKey = paymentProofKey;
+      previousEnrollment.paymentProofName = resolvedProofName;
+    }
     previousEnrollment.adminNote = '';
     previousEnrollment.reviewedBy = null;
     previousEnrollment.reviewedAt = null;
@@ -98,6 +105,7 @@ export const createEnrollment = asyncHandler(async (req, res) => {
       senderNumber,
       paymentNote: paymentNote || '',
       paymentProofKey: paymentProofKey || null,
+      paymentProofName: resolvedProofName,
     });
   }
 

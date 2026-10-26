@@ -9,6 +9,7 @@ export const presignUploadSchema = z.object({
   }).trim().min(1),
   size: z.coerce.number().int().positive('File size must be greater than 0'),
   filename: z.string().trim().optional(),
+  courseId: z.string().trim().optional(),
 });
 
 export const fileUrlQuerySchema = z.object({

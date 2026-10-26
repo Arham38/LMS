@@ -6,6 +6,7 @@ import ApiError from '../utils/ApiError.js';
 import asyncHandler from '../utils/asyncHandler.js';
 import { sendSuccess } from '../utils/response.js';
 import notificationService from '../services/notification.service.js';
+import { getOriginalFilenameFromKey } from '../services/storage.service.js';
 
 // ==========================================
 // ADMIN ASSIGNMENT CONTROLLERS
@@ -100,8 +101,10 @@ export const createAssignmentAdmin = asyncHandler(async (req, res) => {
     throw ApiError.notFound('Bootcamp course not found.', 'COURSE_NOT_FOUND');
   }
 
+  const attachmentName = req.body.attachmentName || (req.body.attachmentKey ? getOriginalFilenameFromKey(req.body.attachmentKey) : null);
   const assignment = await Assignment.create({
     ...req.body,
+    attachmentName,
     course: courseId,
   });
 
@@ -144,11 +147,16 @@ export const updateAssignmentAdmin = asyncHandler(async (req, res) => {
     throw ApiError.notFound('Assignment not found.', 'ASSIGNMENT_NOT_FOUND');
   }
 
+  if (req.body.attachmentKey && !req.body.attachmentName) {
+    req.body.attachmentName = getOriginalFilenameFromKey(req.body.attachmentKey);
+  }
+
   const allowedFields = [
     'week',
     'title',
     'description',
     'attachmentKey',
+    'attachmentName',
     'dueAt',
     'maxMarks',
     'submissionType',
@@ -240,6 +248,7 @@ export const getAssignmentSubmissionsAdmin = asyncHandler(async (req, res) => {
         },
         course: assignment.course,
         fileKey: sub.fileKey,
+        fileName: sub.fileName || (sub.fileKey ? getOriginalFilenameFromKey(sub.fileKey) : null),
         link: sub.link,
         comment: sub.comment,
         version: sub.version,
@@ -271,6 +280,7 @@ export const getAssignmentSubmissionsAdmin = asyncHandler(async (req, res) => {
       },
       course: assignment.course,
       fileKey: null,
+      fileName: null,
       link: null,
       comment: '',
       version: 0,
@@ -378,6 +388,7 @@ export const gradeSubmissionAdmin = asyncHandler(async (req, res) => {
     submission.history.push({
       version: submission.version,
       fileKey: submission.fileKey,
+      fileName: submission.fileName,
       link: submission.link,
       comment: submission.comment,
       submittedAt: submission.submittedAt,
@@ -576,6 +587,7 @@ export const getCourseAssignmentsStudent = asyncHandler(async (req, res) => {
             version: sub.version,
             status: sub.status,
             fileKey: sub.fileKey,
+            fileName: sub.fileName || (sub.fileKey ? getOriginalFilenameFromKey(sub.fileKey) : null),
             link: sub.link,
             comment: sub.comment,
             marks: sub.marks,
@@ -603,11 +615,13 @@ export const getCourseAssignmentsStudent = asyncHandler(async (req, res) => {
  * Submit or resubmit homework solution
  */
 export const submitSolutionStudent = asyncHandler(async (req, res) => {
-  const { fileKey, link, comment } = req.body;
+  const { fileKey, fileName, link, comment } = req.body;
   const assignment = await Assignment.findById(req.params.id);
   if (!assignment || !assignment.isPublished) {
     throw ApiError.notFound('Assignment not found or unavailable.', 'ASSIGNMENT_NOT_FOUND');
   }
+
+  const resolvedFileName = fileName || (fileKey ? getOriginalFilenameFromKey(fileKey) : null);
 
   // Validate submission type
   if (assignment.submissionType === 'file' && !fileKey) {
@@ -658,6 +672,7 @@ export const submitSolutionStudent = asyncHandler(async (req, res) => {
     submission.history.push({
       version: submission.version,
       fileKey: submission.fileKey,
+      fileName: submission.fileName,
       link: submission.link,
       comment: submission.comment,
       submittedAt: submission.submittedAt,
@@ -669,6 +684,7 @@ export const submitSolutionStudent = asyncHandler(async (req, res) => {
 
     submission.version += 1;
     submission.fileKey = fileKey || null;
+    submission.fileName = resolvedFileName;
     submission.link = link || null;
     submission.comment = comment || '';
     submission.status = status;
@@ -696,6 +712,7 @@ export const submitSolutionStudent = asyncHandler(async (req, res) => {
     student: req.user._id,
     course: assignment.course,
     fileKey: fileKey || null,
+    fileName: resolvedFileName,
     link: link || null,
     comment: comment || '',
     version: 1,
@@ -726,7 +743,12 @@ export const getMySubmissionStudent = asyncHandler(async (req, res) => {
     return sendSuccess(res, { data: null });
   }
 
-  return sendSuccess(res, { data: submission });
+  const subObj = submission.toObject();
+  if (subObj.fileKey && !subObj.fileName) {
+    subObj.fileName = getOriginalFilenameFromKey(subObj.fileKey);
+  }
+
+  return sendSuccess(res, { data: subObj });
 });
 
 export default {

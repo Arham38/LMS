@@ -7,12 +7,14 @@ import Spinner from './Spinner';
 
 export const FileUploader = ({
   kind = 'image', // 'image' | 'pdf' | 'zip'
+  courseId,
   label = 'Upload File',
   helperText,
   accept = 'image/png,image/jpeg',
   maxSize = 5 * 1024 * 1024, // 5MB default
   value, // storage key
-  onChange, // callback with key or null
+  fileName, // optional existing filename
+  onChange, // callback with key or (key, fileName)
   className = '',
 }) => {
   const fileInputRef = useRef(null);
@@ -22,6 +24,7 @@ export const FileUploader = ({
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState(null);
   const [uploadedKey, setUploadedKey] = useState(value || null);
+  const [uploadedName, setUploadedName] = useState(fileName || null);
 
   const handleFileSelect = async (e) => {
     const file = e.target.files?.[0];
@@ -70,8 +73,9 @@ export const FileUploader = ({
 
     try {
       // Step A: Request presigned upload URL
-      const { uploadUrl, key } = await storageService.presignUpload({
+      const { uploadUrl, key, filename: returnedFilename } = await storageService.presignUpload({
         kind,
+        courseId,
         contentType: file.type || 'application/octet-stream',
         size: file.size,
         filename: file.name,
@@ -82,8 +86,10 @@ export const FileUploader = ({
         setProgress(percent);
       });
 
+      const finalName = returnedFilename || file.name;
       setUploadedKey(key);
-      onChange?.(key);
+      setUploadedName(finalName);
+      onChange?.(key, finalName);
     } catch (err) {
       setError(err.message || 'Direct file upload failed. Please try again.');
     } finally {
@@ -100,12 +106,13 @@ export const FileUploader = ({
   const handleRemove = () => {
     setSelectedFile(null);
     setUploadedKey(null);
+    setUploadedName(null);
     setProgress(0);
     setError(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
-    onChange?.(null);
+    onChange?.(null, null);
   };
 
   const formatFileSize = (bytes) => {
@@ -188,10 +195,10 @@ export const FileUploader = ({
             <CheckCircle2 className="w-4 h-4 text-success shrink-0" />
             <div className="flex flex-col min-w-0">
               <span className="font-medium text-ink truncate">
-                {selectedFile?.name || 'File attached'}
+                {selectedFile?.name || uploadedName || fileName || storageService.getDisplayFilename(uploadedKey, 'File attached')}
               </span>
               <span className="text-[11px] text-ink-muted">
-                {selectedFile ? formatFileSize(selectedFile.size) : 'Uploaded successfully'}
+                {selectedFile ? formatFileSize(selectedFile.size) : 'Uploaded to Supabase'}
               </span>
             </div>
           </div>

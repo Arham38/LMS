@@ -453,18 +453,23 @@ export const AdminEnrollmentsPage = () => {
                           <Spinner size="sm" />
                         </div>
                       ) : proofUrl ? (
-                        <a
-                          href={proofUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="block group overflow-hidden rounded border border-line bg-surface"
-                        >
-                          <img
-                            src={proofUrl}
-                            alt="Payment receipt proof"
-                            className="w-full max-h-48 object-contain p-1 group-hover:scale-[1.01] transition-transform"
-                          />
-                        </a>
+                        <div className="space-y-1.5">
+                          <span className="text-[11px] font-mono text-ink-muted block truncate" title={activePanelEnrollment.paymentProofName || storageService.getDisplayFilename(activePanelEnrollment.paymentProofKey)}>
+                            {activePanelEnrollment.paymentProofName || storageService.getDisplayFilename(activePanelEnrollment.paymentProofKey)}
+                          </span>
+                          <a
+                            href={proofUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="block group overflow-hidden rounded border border-line bg-surface"
+                          >
+                            <img
+                              src={proofUrl}
+                              alt="Payment receipt proof"
+                              className="w-full max-h-48 object-contain p-1 group-hover:scale-[1.01] transition-transform"
+                            />
+                          </a>
+                        </div>
                       ) : (
                         <div className="text-[11px] text-danger bg-danger-soft/40 p-2 rounded border border-danger/20">
                           Unable to generate preview link.

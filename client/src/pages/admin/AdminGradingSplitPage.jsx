@@ -486,15 +486,26 @@ export const AdminGradingSplitPage = () => {
                       </a>
                     )}
                     {currentItem.fileKey && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleDownloadFile(currentItem.fileKey)}
-                        loading={downloading}
-                        icon={FileArchive}
-                      >
-                        Download Solution Archive
-                      </Button>
+                      <div className="flex items-center gap-2">
+                        <span
+                          className="text-xs font-mono text-ink bg-surface px-2.5 py-1.5 rounded border border-line flex items-center gap-1.5 max-w-[260px] truncate"
+                          title={currentItem.fileName || storageService.getDisplayFilename(currentItem.fileKey)}
+                        >
+                          <FileArchive className="w-3.5 h-3.5 text-primary shrink-0" />
+                          <span className="truncate">
+                            {currentItem.fileName || storageService.getDisplayFilename(currentItem.fileKey)}
+                          </span>
+                        </span>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleDownloadFile(currentItem.fileKey)}
+                          loading={downloading}
+                          icon={Download}
+                        >
+                          Download
+                        </Button>
+                      </div>
                     )}
                   </div>
                 </div>

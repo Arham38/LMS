@@ -4,14 +4,24 @@ export const storageService = {
   /**
    * Request a presigned PUT URL and storage key
    */
-  async presignUpload({ kind, contentType, size, filename }) {
+  async presignUpload({ kind, contentType, size, filename, courseId }) {
     const response = await api.post('/uploads/presign', {
       kind,
       contentType,
       size,
       filename,
+      courseId,
     });
     return response.data || response;
+  },
+
+  /**
+   * Extract human-readable original filename from key
+   */
+  getDisplayFilename(key, fallback = '') {
+    if (!key) return fallback;
+    const last = key.split('/').pop() || '';
+    return last.replace(/^\d+-/, '') || fallback || last;
   },
 
   /**

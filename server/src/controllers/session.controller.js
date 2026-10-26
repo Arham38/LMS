@@ -6,6 +6,7 @@ import ApiError from '../utils/ApiError.js';
 import asyncHandler from '../utils/asyncHandler.js';
 import { sendSuccess } from '../utils/response.js';
 import notificationService from '../services/notification.service.js';
+import { getOriginalFilenameFromKey } from '../services/storage.service.js';
 
 // ==========================================
 // ADMIN CONTROLLERS
@@ -90,8 +91,16 @@ export const createSessionAdmin = asyncHandler(async (req, res) => {
     throw ApiError.notFound('Bootcamp course not found.', 'COURSE_NOT_FOUND');
   }
 
+  const formattedResources = Array.isArray(req.body.resources)
+    ? req.body.resources.map((r) => ({
+        ...r,
+        fileName: r.fileName || (r.fileKey ? getOriginalFilenameFromKey(r.fileKey) : null),
+      }))
+    : [];
+
   const session = await Session.create({
     ...req.body,
+    resources: formattedResources,
     course: courseId,
   });
 
@@ -150,7 +159,14 @@ export const updateSessionAdmin = asyncHandler(async (req, res) => {
 
   allowedUpdates.forEach((field) => {
     if (req.body[field] !== undefined) {
-      session[field] = req.body[field];
+      if (field === 'resources' && Array.isArray(req.body.resources)) {
+        session.resources = req.body.resources.map((r) => ({
+          ...r,
+          fileName: r.fileName || (r.fileKey ? getOriginalFilenameFromKey(r.fileKey) : null),
+        }));
+      } else {
+        session[field] = req.body[field];
+      }
     }
   });
 

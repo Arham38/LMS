@@ -63,6 +63,11 @@ const enrollmentSchema = new mongoose.Schema(
       trim: true,
       default: null,
     },
+    paymentProofName: {
+      type: String,
+      trim: true,
+      default: null,
+    },
     adminNote: {
       type: String,
       trim: true,
