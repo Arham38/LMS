@@ -7,6 +7,7 @@ import { AlertCircle, User, Mail, Phone, ArrowRight } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import AuthSplitLayout from '../../components/auth/AuthSplitLayout';
 import { FormField, Input, PasswordInput, Checkbox, Button } from '../../components/ui';
+import { useDocumentMeta } from '../../utils/seo';
 
 const pakistanPhoneRegex = /^(\+92|0)?3[0-9]{9}$/;
 const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
@@ -42,6 +43,12 @@ export const RegisterPage = () => {
   const navigate = useNavigate();
   const { register: registerUser } = useAuth();
   const [serverError, setServerError] = useState('');
+
+  useDocumentMeta({
+    title: 'Create Account — Apply for Bootcamp',
+    description: 'Register a student account to enroll in live online cohorts at CodeCraft Bootcamp.',
+    canonicalPath: '/register',
+  });
 
   const {
     register,

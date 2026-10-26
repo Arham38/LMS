@@ -18,8 +18,11 @@ import Button from '../../components/ui/Button';
 import Badge from '../../components/ui/Badge';
 import Input from '../../components/ui/Input';
 import Card, { CardHeader, CardContent } from '../../components/ui/Card';
+import ConfirmDialog from '../../components/ui/ConfirmDialog';
+import { useToast } from '../../components/ui/Toast';
 
 export const AdminMessagesPage = () => {
+  const toast = useToast();
   const [messages, setMessages] = useState([]);
   const [pagination, setPagination] = useState({ page: 1, pages: 1, total: 0, unreadCount: 0 });
   const [loading, setLoading] = useState(true);
@@ -29,6 +32,9 @@ export const AdminMessagesPage = () => {
   const [selectedMessage, setSelectedMessage] = useState(null);
   const [adminNotes, setAdminNotes] = useState('');
   const [updating, setUpdating] = useState(false);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [messageToDelete, setMessageToDelete] = useState(null);
+  const [deleting, setDeleting] = useState(false);
 
   const fetchMessages = async (page = 1) => {
     setLoading(true);
@@ -100,8 +106,9 @@ export const AdminMessagesPage = () => {
         ...prev,
         unreadCount: newStatus ? Math.max(0, prev.unreadCount - 1) : prev.unreadCount + 1,
       }));
+      toast.success(newStatus ? 'Message marked as read' : 'Message marked as unread');
     } catch (err) {
-      alert('Failed to update status');
+      toast.error('Failed to update message status');
     }
   };
 
@@ -114,24 +121,36 @@ export const AdminMessagesPage = () => {
       setMessages((prev) =>
         prev.map((m) => (m._id === selectedMessage._id ? { ...m, adminNotes } : m))
       );
+      toast.success('Private staff notes saved');
     } catch (err) {
-      alert('Failed to save notes');
+      toast.error('Failed to save notes');
     } finally {
       setUpdating(false);
     }
   };
 
-  const handleDelete = async (id, e) => {
+  const promptDelete = (id, e) => {
     e.stopPropagation();
-    if (!window.confirm('Are you sure you want to delete this message?')) return;
+    setMessageToDelete(id);
+    setDeleteConfirmOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!messageToDelete) return;
+    setDeleting(true);
     try {
-      await contactService.deleteMessage(id);
-      setMessages((prev) => prev.filter((m) => m._id !== id));
-      if (selectedMessage?._id === id) {
+      await contactService.deleteMessage(messageToDelete);
+      setMessages((prev) => prev.filter((m) => m._id !== messageToDelete));
+      if (selectedMessage?._id === messageToDelete) {
         setSelectedMessage(null);
       }
+      toast.success('Message deleted');
+      setDeleteConfirmOpen(false);
+      setMessageToDelete(null);
     } catch (err) {
-      alert('Failed to delete message');
+      toast.error('Failed to delete message');
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -310,7 +329,7 @@ export const AdminMessagesPage = () => {
                   <Button
                     variant="danger"
                     size="sm"
-                    onClick={(e) => handleDelete(selectedMessage._id, e)}
+                    onClick={(e) => promptDelete(selectedMessage._id, e)}
                     leftIcon={Trash2}
                   >
                     Delete
@@ -384,6 +403,20 @@ export const AdminMessagesPage = () => {
           )}
         </div>
       </div>
+
+      <ConfirmDialog
+        isOpen={deleteConfirmOpen}
+        onClose={() => {
+          setDeleteConfirmOpen(false);
+          setMessageToDelete(null);
+        }}
+        onConfirm={handleConfirmDelete}
+        title="Delete Contact Inquiry"
+        message="Are you sure you want to permanently delete this inquiry? This action cannot be undone."
+        confirmText="Delete Message"
+        isDestructive
+        isLoading={deleting}
+      />
     </div>
   );
 };

@@ -9,9 +9,10 @@
     "client"
   ],
   "scripts": {
-    "dev:server": "cd server && npm run dev",
-    "dev:client": "cd client && npm run dev",
-    "test:server": "cd server && npm test",
-    "build:client": "cd client && npm run build"
+    "dev:server": "npm run dev --prefix server",
+    "dev:client": "npm run dev --prefix client",
+    "test:server": "npm test --prefix server",
+    "test:e2e": "npx playwright test --config=client/playwright.config.js",
+    "build:client": "npm run build --prefix client"
   }
 }

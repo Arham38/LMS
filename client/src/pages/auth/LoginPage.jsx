@@ -7,6 +7,7 @@ import { AlertCircle, Mail, ArrowRight } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import AuthSplitLayout from '../../components/auth/AuthSplitLayout';
 import { FormField, Input, PasswordInput, Button } from '../../components/ui';
+import { useDocumentMeta } from '../../utils/seo';
 
 const loginSchema = z.object({
   email: z
@@ -21,6 +22,12 @@ export const LoginPage = () => {
   const location = useLocation();
   const { login } = useAuth();
   const [serverError, setServerError] = useState('');
+
+  useDocumentMeta({
+    title: 'Student Sign In — CodeCraft Portal',
+    description: 'Sign in to access your live classes, homework assignments, quizzes, and gradebook.',
+    canonicalPath: '/login',
+  });
 
   const {
     register,

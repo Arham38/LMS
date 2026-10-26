@@ -26,7 +26,7 @@ const router = Router();
 router.post('/register', authLimiter, validateBody(registerSchema), register);
 router.post('/login', authLimiter, validateBody(loginSchema), login);
 router.post('/forgot-password', authLimiter, validateBody(forgotPasswordSchema), forgotPassword);
-router.post('/reset-password', validateBody(resetPasswordSchema), resetPassword);
+router.post('/reset-password', authLimiter, validateBody(resetPasswordSchema), resetPassword);
 
 // Protected account management endpoints
 router.get('/me', protect, getMe);

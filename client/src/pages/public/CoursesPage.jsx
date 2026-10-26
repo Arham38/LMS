@@ -21,7 +21,7 @@ export const CoursesPage = () => {
     setError(null);
     try {
       const data = await courseService.getPublicCourses();
-      setCourses(data || []);
+      setCourses(Array.isArray(data) ? data : data?.items || []);
     } catch (err) {
       setError(err.message || 'Failed to load courses. Please try again.');
     } finally {

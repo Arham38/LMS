@@ -30,7 +30,15 @@ export const authLimiter = createLimiter({
   code: 'RATE_LIMITED_AUTH',
 });
 
+export const contactLimiter = createLimiter({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 10,
+  message: 'Too many inquiries submitted from this IP. Please try again after 15 minutes or message us on WhatsApp.',
+  code: 'RATE_LIMITED_CONTACT',
+});
+
 export default {
   generalLimiter,
   authLimiter,
+  contactLimiter,
 };

@@ -7,6 +7,7 @@ import { CheckCircle2, AlertCircle, ArrowRight } from 'lucide-react';
 import authService from '../../services/auth.service';
 import AuthSplitLayout from '../../components/auth/AuthSplitLayout';
 import { FormField, PasswordInput, Button } from '../../components/ui';
+import { useDocumentMeta } from '../../utils/seo';
 
 const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
 
@@ -27,6 +28,12 @@ export const ResetPasswordPage = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
+
+  useDocumentMeta({
+    title: 'Create New Password — CodeCraft Portal',
+    description: 'Enter your new account password.',
+    canonicalPath: '/reset-password',
+  });
 
   const [isSuccess, setIsSuccess] = useState(false);
   const [serverError, setServerError] = useState('');

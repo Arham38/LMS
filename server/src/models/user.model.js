@@ -65,6 +65,7 @@ const userSchema = new mongoose.Schema(
     },
     privateNotes: {
       type: String,
+      select: false,
       default: '',
     },
   },
@@ -76,6 +77,10 @@ const userSchema = new mongoose.Schema(
         delete ret.passwordResetToken;
         delete ret.passwordResetExpires;
         delete ret.__v;
+        // Non-admins must never see private admin notes
+        if (ret.role !== 'admin' && ret.privateNotes !== undefined) {
+          delete ret.privateNotes;
+        }
         return ret;
       },
     },

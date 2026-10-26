@@ -45,7 +45,7 @@ export const getAdminStudents = asyncHandler(async (req, res) => {
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
-      .select('-passwordResetToken -passwordResetExpires'),
+      .select('-passwordResetToken -passwordResetExpires +privateNotes'),
     User.countDocuments(query),
   ]);
 
@@ -105,7 +105,7 @@ export const getAdminStudentById = asyncHandler(async (req, res) => {
   const student = await User.findOne({
     _id: req.params.id,
     role: 'student',
-  }).select('-passwordResetToken -passwordResetExpires');
+  }).select('-passwordResetToken -passwordResetExpires +privateNotes');
 
   if (!student) {
     throw ApiError.notFound('Student record not found.', 'STUDENT_NOT_FOUND');

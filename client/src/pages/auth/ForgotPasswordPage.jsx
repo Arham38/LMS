@@ -7,6 +7,7 @@ import { Mail, CheckCircle2, AlertCircle, ArrowLeft } from 'lucide-react';
 import authService from '../../services/auth.service';
 import AuthSplitLayout from '../../components/auth/AuthSplitLayout';
 import { FormField, Input, Button } from '../../components/ui';
+import { useDocumentMeta } from '../../utils/seo';
 
 const forgotSchema = z.object({
   email: z
@@ -18,6 +19,12 @@ const forgotSchema = z.object({
 export const ForgotPasswordPage = () => {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [serverError, setServerError] = useState('');
+
+  useDocumentMeta({
+    title: 'Reset Forgotten Password — CodeCraft Portal',
+    description: 'Request a password reset link for your CodeCraft student account.',
+    canonicalPath: '/forgot-password',
+  });
 
   const {
     register,
