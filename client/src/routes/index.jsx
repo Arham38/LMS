@@ -35,6 +35,7 @@ const StudentCourseSpacePage = lazy(() => import('../pages/student/StudentCourse
 const StudentScheduleRouter = lazy(() => import('../pages/student/StudentScheduleRouter'));
 const StudentQuizPage = lazy(() => import('../pages/student/StudentQuizPage'));
 const StudentGradesPage = lazy(() => import('../pages/student/StudentGradesPage'));
+const StudentNotesPage = lazy(() => import('../pages/student/StudentNotesPage'));
 
 // Lazy Loaded Admin Pages
 const AdminDashboardPage = lazy(() => import('../pages/admin/AdminDashboardPage'));
@@ -53,6 +54,7 @@ const AdminGradebookPage = lazy(() => import('../pages/admin/AdminGradebookPage'
 const AdminEnrollmentsPage = lazy(() => import('../pages/admin/AdminEnrollmentsPage'));
 const AdminSettingsPage = lazy(() => import('../pages/admin/AdminSettingsPage'));
 const AdminMessagesPage = lazy(() => import('../pages/admin/AdminMessagesPage'));
+const AdminMaterialsPage = lazy(() => import('../pages/admin/AdminMaterialsPage'));
 
 // Lazy Loaded Common Pages
 const NotificationsPage = lazy(() => import('../pages/NotificationsPage'));
@@ -318,10 +320,18 @@ export const router = createBrowserRouter([
         ),
       },
       {
+        path: 'notes',
+        element: (
+          <RouteSuspense>
+            <StudentNotesPage />
+          </RouteSuspense>
+        ),
+      },
+      {
         path: 'materials',
         element: (
           <RouteSuspense>
-            <StudentCourseSpacePage />
+            <StudentNotesPage />
           </RouteSuspense>
         ),
       },
@@ -556,6 +566,22 @@ export const router = createBrowserRouter([
         element: (
           <RouteSuspense>
             <AdminEnrollmentsPage />
+          </RouteSuspense>
+        ),
+      },
+      {
+        path: 'materials',
+        element: (
+          <RouteSuspense>
+            <AdminMaterialsPage />
+          </RouteSuspense>
+        ),
+      },
+      {
+        path: 'notes',
+        element: (
+          <RouteSuspense>
+            <AdminMaterialsPage />
           </RouteSuspense>
         ),
       },
