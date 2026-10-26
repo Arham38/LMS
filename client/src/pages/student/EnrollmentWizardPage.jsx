@@ -32,6 +32,7 @@ import {
   Badge,
   Skeleton,
   useToast,
+  FileUploader,
 } from '../../components/ui';
 
 const enrollmentSchema = z.object({
@@ -56,6 +57,7 @@ export const EnrollmentWizardPage = () => {
   const [copiedAccount, setCopiedAccount] = useState(null);
   const [createdEnrollment, setCreatedEnrollment] = useState(null);
   const [serverError, setServerError] = useState('');
+  const [proofKey, setProofKey] = useState('');
 
   const {
     register,
@@ -126,6 +128,7 @@ export const EnrollmentWizardPage = () => {
         senderName: values.senderName,
         senderNumber: values.senderNumber,
         paymentNote: values.paymentNote,
+        paymentProofKey: proofKey || undefined,
       });
 
       setCreatedEnrollment(response);
@@ -401,6 +404,15 @@ export const EnrollmentWizardPage = () => {
                   {...register('senderNumber')}
                 />
               </FormField>
+
+              <FileUploader
+                kind="image"
+                accept="image/png,image/jpeg"
+                label="Payment Receipt Screenshot (Optional)"
+                helperText="Upload a screenshot or photo of your transfer receipt (PNG or JPG up to 5MB)"
+                value={proofKey}
+                onChange={setProofKey}
+              />
 
               <FormField
                 id="payment-note"

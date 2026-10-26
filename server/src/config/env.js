@@ -13,6 +13,12 @@ const envSchema = z.object({
   ADMIN_NAME: z.string().default('Admin Instructor'),
   ADMIN_EMAIL: z.string().email().default('admin@codecraft.academy'),
   ADMIN_PASSWORD: z.string().min(8).default('AdminSecurePass123!'),
+  // Cloudflare R2 Storage (Small files only)
+  R2_ACCOUNT_ID: z.string().default('dummy_account_id'),
+  R2_ACCESS_KEY_ID: z.string().default('dummy_access_key_id'),
+  R2_SECRET_ACCESS_KEY: z.string().default('dummy_secret_access_key'),
+  R2_BUCKET: z.string().default('lms-private-bucket'),
+  R2_ENDPOINT: z.string().default('https://dummy_account_id.r2.cloudflarestorage.com'),
 });
 
 const parseEnv = () => {

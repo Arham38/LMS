@@ -14,6 +14,7 @@ export const createEnrollment = asyncHandler(async (req, res) => {
     senderName,
     senderNumber,
     paymentNote,
+    paymentProofKey,
   } = req.body;
 
   // 1. Verify course exists and is published
@@ -75,6 +76,7 @@ export const createEnrollment = asyncHandler(async (req, res) => {
     previousEnrollment.senderName = senderName;
     previousEnrollment.senderNumber = senderNumber;
     previousEnrollment.paymentNote = paymentNote || '';
+    if (paymentProofKey) previousEnrollment.paymentProofKey = paymentProofKey;
     previousEnrollment.adminNote = '';
     previousEnrollment.reviewedBy = null;
     previousEnrollment.reviewedAt = null;
@@ -94,6 +96,7 @@ export const createEnrollment = asyncHandler(async (req, res) => {
       senderName,
       senderNumber,
       paymentNote: paymentNote || '',
+      paymentProofKey: paymentProofKey || null,
     });
   }
 

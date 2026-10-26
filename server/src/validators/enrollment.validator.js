@@ -9,6 +9,7 @@ export const createEnrollmentSchema = z.object({
   senderName: z.string().trim().min(2, 'Sender name is required'),
   senderNumber: z.string().trim().min(4, 'Sender account / mobile number is required'),
   paymentNote: z.string().trim().optional(),
+  paymentProofKey: z.string().trim().optional(),
 });
 
 export const adminReviewEnrollmentSchema = z

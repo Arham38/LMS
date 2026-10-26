@@ -25,3 +25,4 @@ export { Tooltip } from './Tooltip';
 export { ProgressBar } from './ProgressBar';
 export { StatStrip } from './StatStrip';
 export { PageHeader } from './PageHeader';
+export { FileUploader } from './FileUploader';

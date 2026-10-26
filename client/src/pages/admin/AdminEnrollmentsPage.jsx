@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import enrollmentService from '../../services/enrollment.service';
 import courseService from '../../services/course.service';
+import storageService from '../../services/storage.service';
 import {
   PageHeader,
   Button,
@@ -25,6 +26,7 @@ import {
   FormField,
   Textarea,
   Avatar,
+  Spinner,
   useToast,
 } from '../../components/ui';
 
@@ -43,6 +45,40 @@ export const AdminEnrollmentsPage = () => {
 
   // Slide-over side panel
   const [activePanelEnrollment, setActivePanelEnrollment] = useState(null);
+  const [proofUrl, setProofUrl] = useState(null);
+  const [loadingProof, setLoadingProof] = useState(false);
+
+  useEffect(() => {
+    let isMounted = true;
+    if (activePanelEnrollment?.paymentProofKey) {
+      setLoadingProof(true);
+      setProofUrl(null);
+      storageService
+        .getFileUrl(activePanelEnrollment.paymentProofKey)
+        .then((res) => {
+          if (isMounted) {
+            setProofUrl(res?.downloadUrl || null);
+          }
+        })
+        .catch((err) => {
+          console.error('Failed to load payment proof signed URL:', err);
+          if (isMounted) {
+            setProofUrl(null);
+          }
+        })
+        .finally(() => {
+          if (isMounted) {
+            setLoadingProof(false);
+          }
+        });
+    } else {
+      setProofUrl(null);
+      setLoadingProof(false);
+    }
+    return () => {
+      isMounted = false;
+    };
+  }, [activePanelEnrollment?.paymentProofKey]);
 
   // Review Dialog States
   const [reviewAction, setReviewAction] = useState(null); // 'approve' | 'reject' | null
@@ -393,6 +429,53 @@ export const AdminEnrollmentsPage = () => {
                       Note: "{activePanelEnrollment.paymentNote}"
                     </div>
                   )}
+
+                  {/* Payment Proof Receipt Screenshot */}
+                  <div className="pt-2 border-t border-line/60 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-ink-muted font-medium">Receipt Screenshot:</span>
+                      {proofUrl && (
+                        <a
+                          href={proofUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[11px] text-primary hover:underline inline-flex items-center gap-1 font-medium"
+                        >
+                          <span>Open Image</span>
+                          <ExternalLink className="w-3 h-3" />
+                        </a>
+                      )}
+                    </div>
+
+                    {activePanelEnrollment.paymentProofKey ? (
+                      loadingProof ? (
+                        <div className="h-28 bg-surface flex items-center justify-center border border-line rounded">
+                          <Spinner size="sm" />
+                        </div>
+                      ) : proofUrl ? (
+                        <a
+                          href={proofUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="block group overflow-hidden rounded border border-line bg-surface"
+                        >
+                          <img
+                            src={proofUrl}
+                            alt="Payment receipt proof"
+                            className="w-full max-h-48 object-contain p-1 group-hover:scale-[1.01] transition-transform"
+                          />
+                        </a>
+                      ) : (
+                        <div className="text-[11px] text-danger bg-danger-soft/40 p-2 rounded border border-danger/20">
+                          Unable to generate preview link.
+                        </div>
+                      )
+                    ) : (
+                      <div className="text-[11px] text-ink-muted italic">
+                        No receipt screenshot uploaded by student.
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
 
