@@ -72,17 +72,22 @@ export const AdminLedgerPage = () => {
           paymentMethod: selectedMethod === 'all' ? undefined : selectedMethod,
           search: search || undefined,
         }),
-        courseService.getCoursesAdmin(),
+        courseService.getAdminCourses(),
       ]);
 
       setData(ledgerRes);
-      setCourses(coursesRes?.items || coursesRes || []);
+      const safeCourses = Array.isArray(coursesRes?.items)
+        ? coursesRes.items
+        : Array.isArray(coursesRes)
+        ? coursesRes
+        : [];
+      setCourses(safeCourses);
     } catch (err) {
       toast.error('Failed to load financial ledger data.');
     } finally {
       setLoading(false);
     }
-  }, [page, status, selectedCourse, selectedMethod, search, toast]);
+  }, [page, status, selectedCourse, selectedMethod, search]);
 
   useEffect(() => {
     fetchLedger();

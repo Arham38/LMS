@@ -75,7 +75,7 @@ export const AdminMaterialsPage = () => {
     const fetchCourses = async () => {
       setLoading(true);
       try {
-        const res = await courseService.getCoursesAdmin();
+        const res = await courseService.getAdminCourses();
         const list = Array.isArray(res) ? res : res?.items || [];
         setCourses(list);
 

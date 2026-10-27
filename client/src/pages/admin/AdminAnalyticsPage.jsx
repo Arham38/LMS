@@ -52,17 +52,22 @@ export const AdminAnalyticsPage = () => {
         analyticsService.getAdminAnalytics({
           courseId: selectedCourse || undefined,
         }),
-        courseService.getCoursesAdmin(),
+        courseService.getAdminCourses(),
       ]);
 
       setData(analyticsRes);
-      setCourses(coursesRes?.items || coursesRes || []);
+      const safeCourses = Array.isArray(coursesRes?.items)
+        ? coursesRes.items
+        : Array.isArray(coursesRes)
+        ? coursesRes
+        : [];
+      setCourses(safeCourses);
     } catch (err) {
       toast.error('Failed to load cohort analytics.');
     } finally {
       setLoading(false);
     }
-  }, [selectedCourse, toast]);
+  }, [selectedCourse]);
 
   useEffect(() => {
     fetchAnalytics();
