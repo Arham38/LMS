@@ -53,6 +53,8 @@ import {
   deleteAnnouncementAdmin,
 } from '../controllers/announcement.controller.js';
 import { getAdminStats } from '../controllers/adminStats.controller.js';
+import { getAdminAnalytics } from '../controllers/adminAnalytics.controller.js';
+import { getAdminLedger, exportAdminLedgerCSV } from '../controllers/adminLedger.controller.js';
 import {
   getAdminStudents,
   getAdminStudentById,
@@ -156,8 +158,13 @@ router.get('/assignments/:id/submissions', getAssignmentSubmissionsAdmin);
 router.patch('/submissions/:id/grade', validateBody(gradeSubmissionSchema), gradeSubmissionAdmin);
 router.get('/assignments/:id/export', exportAssignmentMarksCSVAdmin);
 
-// Admin Telemetry & Aggregated Stats
+// Admin Telemetry, Stats & Deep-Dive Analytics
 router.get('/stats', getAdminStats);
+router.get('/analytics', getAdminAnalytics);
+
+// Financial Ledger & Revenue Reconciliation
+router.get('/ledger', getAdminLedger);
+router.get('/ledger/export', exportAdminLedgerCSV);
 
 // Course Announcements Management
 router.get('/courses/:courseId/announcements', getAdminAnnouncementsByCourse);

@@ -41,7 +41,7 @@ test.describe('End-to-End Bootcamp Smoke Suite', () => {
     await submitBtn.click();
 
     // Verify successful registration redirects or displays welcome/dashboard
-    await page.waitForTimeout(2000);
+    await page.waitForURL(/(\/student|\/login|\/dashboard|\/courses)/, { timeout: 10000 });
     const currentUrl = page.url();
     expect(currentUrl).toMatch(/(\/student|\/login|\/dashboard|\/courses)/);
   });

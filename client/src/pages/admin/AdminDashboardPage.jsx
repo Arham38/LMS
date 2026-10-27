@@ -111,17 +111,23 @@ export const AdminDashboardPage = () => {
 
       {/* Primary Telemetry Stat Strip */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3.5">
-        <Card className="p-4 bg-paper">
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-ink-muted">
-            Total Revenue
-          </p>
+        <Link
+          to="/admin/ledger"
+          className="p-4 bg-paper rounded-lg border border-line hover:border-ink/40 transition-all block group"
+        >
+          <div className="flex items-center justify-between">
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-ink-muted group-hover:text-ink transition-colors">
+              Total Revenue
+            </p>
+            <ChevronRight className="w-3 h-3 text-ink-muted group-hover:text-ink group-hover:translate-x-0.5 transition-all" />
+          </div>
           <p className="text-xl font-bold font-mono text-ink mt-1">
             {loading ? <Skeleton className="h-6 w-24" /> : formatPKR(stats.totalRevenueCollected)}
           </p>
           <p className="text-[10px] text-ink-muted mt-1">
-            {stats.approvedEnrollments || 0} paid seats
+            {stats.approvedEnrollments || 0} paid seats &rarr; Ledger
           </p>
-        </Card>
+        </Link>
 
         <Card className="p-4 bg-paper">
           <p className="text-[11px] font-semibold uppercase tracking-wider text-ink-muted">
@@ -414,7 +420,13 @@ export const AdminDashboardPage = () => {
                     Attendance rate across last 6 completed lectures
                   </p>
                 </div>
-                <BarChart2 className="w-4 h-4 text-ink-muted" />
+                <Link
+                  to="/admin/analytics"
+                  className="text-xs text-primary hover:text-primary-hover flex items-center gap-1 font-medium transition-colors"
+                >
+                  <span>Analytics</span>
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </Link>
               </div>
             </CardHeader>
 
@@ -470,6 +482,20 @@ export const AdminDashboardPage = () => {
               Quick Operations
             </h4>
             <div className="space-y-2">
+              <Link
+                to="/admin/ledger"
+                className="flex items-center justify-between p-2.5 bg-surface hover:bg-surface-hover rounded border border-line text-xs font-medium text-ink transition-colors"
+              >
+                <span>Ledger & Domestic Payment Reconciliation</span>
+                <ChevronRight className="w-4 h-4 text-ink-muted" />
+              </Link>
+              <Link
+                to="/admin/analytics"
+                className="flex items-center justify-between p-2.5 bg-surface hover:bg-surface-hover rounded border border-line text-xs font-medium text-ink transition-colors"
+              >
+                <span>Cohort Academic Analytics & Milestones</span>
+                <ChevronRight className="w-4 h-4 text-ink-muted" />
+              </Link>
               <Link
                 to="/admin/announcements"
                 className="flex items-center justify-between p-2.5 bg-surface hover:bg-surface-hover rounded border border-line text-xs font-medium text-ink transition-colors"

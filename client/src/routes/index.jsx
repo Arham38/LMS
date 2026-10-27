@@ -55,6 +55,8 @@ const AdminEnrollmentsPage = lazy(() => import('../pages/admin/AdminEnrollmentsP
 const AdminSettingsPage = lazy(() => import('../pages/admin/AdminSettingsPage'));
 const AdminMessagesPage = lazy(() => import('../pages/admin/AdminMessagesPage'));
 const AdminMaterialsPage = lazy(() => import('../pages/admin/AdminMaterialsPage'));
+const AdminAnalyticsPage = lazy(() => import('../pages/admin/AdminAnalyticsPage'));
+const AdminLedgerPage = lazy(() => import('../pages/admin/AdminLedgerPage'));
 
 // Lazy Loaded Common Pages
 const NotificationsPage = lazy(() => import('../pages/NotificationsPage'));
@@ -373,7 +375,7 @@ export const router = createBrowserRouter([
         path: 'analytics',
         element: (
           <RouteSuspense>
-            <AdminDashboardPage />
+            <AdminAnalyticsPage />
           </RouteSuspense>
         ),
       },
@@ -589,13 +591,15 @@ export const router = createBrowserRouter([
         path: 'ledger',
         element: (
           <RouteSuspense>
-            <PhasePlaceholder
-              title="Financial Ledger & Revenue"
-              subtitle="Detailed accounting of all cohort collections in PKR."
-              phaseNumber="4"
-              phaseName="Revenue Ledger & Export"
-              breadcrumbs={[{ label: 'Admin', to: '/admin/dashboard' }, { label: 'Financial Ledger' }]}
-            />
+            <AdminLedgerPage />
+          </RouteSuspense>
+        ),
+      },
+      {
+        path: 'revenue',
+        element: (
+          <RouteSuspense>
+            <AdminLedgerPage />
           </RouteSuspense>
         ),
       },
