@@ -14,6 +14,7 @@
     "test:server": "npm test --prefix server",
     "test:e2e": "npx playwright test --config=client/playwright.config.js",
     "clean:test-data": "node server/src/scripts/clean_test_data.js",
+    "seed:demo": "npm run seed:demo --prefix server",
     "build:client": "npm run build --prefix client"
   }
 }
