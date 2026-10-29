@@ -53,7 +53,7 @@ export const seedDatabase = async () => {
             'Build and deploy RESTful microservices with Node.js and Express',
             'Model complex MongoDB schemas with indexing and aggregation pipelines',
             'Architect scalable React frontends using clean hooks and design systems',
-            'Write integration tests and deploy to cloud platforms (Render, Vercel, Atlas)',
+            'Write integration tests and deploy to cloud platforms (Render, Atlas)',
           ],
           requirements: [
             'Basic knowledge of JavaScript (ES6 syntax and functions)',

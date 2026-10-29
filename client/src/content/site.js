@@ -199,7 +199,7 @@ export const siteContent = {
         summary: 'Packaging, containerization, hosting infrastructure, and portfolio capstone defense.',
         topics: [
           'Environment management, production build pipelines and minification',
-          'Deployment on Render, Vercel, and Supabase',
+          'Deployment on Render and Supabase',
           'Reverse proxies, SSL termination, and custom domain setup',
           'Capstone project presentation: live code walkthrough and architectural defense',
           'Course certificate issuance and next-steps guidance',

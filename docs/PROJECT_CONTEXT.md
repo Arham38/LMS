@@ -6,7 +6,7 @@ A Learning Management System for ONE instructor (the admin) who runs paid live o
 ## Stack
 - **Client**: React 18 + Vite, Tailwind CSS, react-router v6, Axios, react-hook-form + zod, lucide-react. No UI kit: build our own components per `docs/DESIGN_SYSTEM.md`.
 - **Server**: Node 20, Express, Mongoose, jsonwebtoken, bcryptjs, zod, helmet, cors, express-rate-limit, morgan, @aws-sdk/client-s3.
-- **Database**: MongoDB Atlas. Files: Supabase Storage (small files only). Deploy: Vercel (client) and Render (server).
+- **Database**: MongoDB Atlas. Files: Supabase Storage (small files only). Deploy: Cloud hosting (e.g., Render for server, static hosting for client).
 - **Monorepo**: `/client`, `/server`, `/docs`. ES modules everywhere. ESLint and Prettier configured.
 - **Server folders**: `src/{config,models,controllers,routes,middleware,services,validators,utils,scripts,tests}`
 - **Client folders**: `src/{pages,components/ui,components/layout,features,context,services,hooks,utils,styles,config}`

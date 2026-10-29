@@ -25,7 +25,7 @@ import contactRoutes from './routes/contact.routes.js';
 
 const app = express();
 
-// Trust reverse proxy (for Render/Vercel and accurate IP rate limiting)
+// Trust reverse proxy (for Render and accurate IP rate limiting)
 app.set('trust proxy', 1);
 
 // Request identifier
